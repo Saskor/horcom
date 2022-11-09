@@ -1,0 +1,2 @@
+export { SearchPageList } from "./SearchPageList";
+
