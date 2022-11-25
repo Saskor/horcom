@@ -74,31 +74,27 @@ class SearchPageStoreClass {
   // init
   private getCategoriesWithSubcategories = (
     servicesProvidersOrManufacturers: Array<ServicesProviderOrManufacturer>
-  ): CategoriesWithSubcategories => {
-    const result = servicesProvidersOrManufacturers.reduce(
-      (acc: CategoriesWithSubcategories, servicesProviderOrManufacturer) => {
-        if (acc[servicesProviderOrManufacturer.category]) {
-          return {
-            ...acc,
-            [servicesProviderOrManufacturer.category]: {
-              ...acc[servicesProviderOrManufacturer.category],
-              ...servicesProviderOrManufacturer.subcategories
-            }
-          };
-        }
-
+  ): CategoriesWithSubcategories => servicesProvidersOrManufacturers.reduce(
+    (acc: CategoriesWithSubcategories, servicesProviderOrManufacturer) => {
+      if (acc[servicesProviderOrManufacturer.category]) {
         return {
           ...acc,
           [servicesProviderOrManufacturer.category]: {
+            ...acc[servicesProviderOrManufacturer.category],
             ...servicesProviderOrManufacturer.subcategories
           }
         };
-      },
-      {}
-    );
+      }
 
-    return result;
-  }
+      return {
+        ...acc,
+        [servicesProviderOrManufacturer.category]: {
+          ...servicesProviderOrManufacturer.subcategories
+        }
+      };
+    },
+    {}
+  )
 
   // init
   private getCategoriesSelectorOptions = (): Array<CategoriesSelectorOption> => {
@@ -176,6 +172,7 @@ class SearchPageStoreClass {
       serviceProducer => {
         let allConditionsTruthy = false;
         let requestParamName: keyof FilterFormValues;
+        // eslint-disable-next-line guard-for-in
         for (requestParamName in requestParams) {
           const requestParam = requestParams[requestParamName];
 
@@ -188,6 +185,7 @@ class SearchPageStoreClass {
           case "subcategory":
             if (typeof requestParam.value === "string") {
               let subcategory: string;
+              // eslint-disable-next-line guard-for-in
               for (subcategory in serviceProducer.subcategories) {
                 allConditionsTruthy = subcategory.toLowerCase().includes(requestParam.value.toLowerCase());
 

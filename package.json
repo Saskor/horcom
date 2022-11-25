@@ -1,5 +1,6 @@
 {
   "name": "my-app",
+  "homepage": "https://saskor.github.io/car-tech/",
   "version": "0.0.1",
   "scripts": {
     "start": "webpack serve --config webpack.dev.config.ts",
@@ -89,6 +90,7 @@
     "fork-ts-checker-webpack-plugin": "^7.2.1",
     "html-webpack-plugin": "^5.5.0",
     "jest": "^28.0.3",
+    "mini-css-extract-plugin": "^2.6.1",
     "prettier": "^2.6.2",
     "react-refresh": "^0.14.0",
     "sass": "^1.51.0",

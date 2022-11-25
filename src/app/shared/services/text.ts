@@ -15,7 +15,7 @@ class TextHelper {
     try {
       document.execCommand("copy");
     } catch (err) {
-      console.error("Fallback: Oops, unable to copy", err);
+      throw new Error("Fallback: Oops, unable to copy");
     }
 
     document.body.removeChild(textArea);
@@ -30,7 +30,7 @@ class TextHelper {
     try {
       await navigator.clipboard.writeText(text);
     } catch (err) {
-      console.error("Async: Could not copy text: ", err);
+      throw new Error("Async: Could not copy text: ");
     }
   }
 }

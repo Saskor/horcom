@@ -13,7 +13,7 @@ export const FieldSelect = <Option extends StandardOption, >(
     dropdownMenuItemsData: Array<Option>;
     fieldName: string;
     formValues: { [key: string]: any };
-    onFieldChange: (fieldName: string, value: Option) => void;
+    onFieldChange: (changingFieldName: string, value: Option) => void;
     MenuItemComponent?: MenuItemComponentType;
   }
 ) => {

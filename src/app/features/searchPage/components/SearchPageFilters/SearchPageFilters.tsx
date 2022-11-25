@@ -23,7 +23,7 @@ export const SearchPageFilters = observer((
     citiesOptions
   } = searchPageStore;
 
-  React.useEffect(() => init(), []);
+  React.useEffect(() => init(), [ init ]);
 
   return (
     <div className={cn(styles.container)}>

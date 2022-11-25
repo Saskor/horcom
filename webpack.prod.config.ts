@@ -4,10 +4,12 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import ESLintPlugin from "eslint-webpack-plugin";
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 const config: Configuration = {
+  stats: "detailed",
   mode: "production",
-  entry: "./src/index.tsx",
+  entry: { main: "./src/index.tsx" },
   output: {
     path: path.resolve(__dirname, "build"),
     filename: "[name].[contenthash].js",
@@ -46,20 +48,24 @@ const config: Configuration = {
         test: /\.s[ac]ss$/i,
         exclude: /node_modules/,
         use: [
-          // Creates `style` nodes from JS strings
-          "style-loader",
+          MiniCssExtractPlugin.loader,
           // Translates CSS into CommonJS
           {
             loader: "css-loader",
             options: {
               importLoaders: 1,
               modules: {
-                localIdentName: "[name]__[local]--[hash:base64:5]"
+                localIdentName: "[hash:base64:5]"
               }
             }
           },
-          // Compiles Sass to CSS
-          "sass-loader"
+          {
+            // Compiles Sass to CSS
+            loader: "sass-loader",
+            options: {
+              sourceMap: true
+            }
+          }
         ]
       },
       {
@@ -77,7 +83,12 @@ const config: Configuration = {
     modules: [ path.resolve(__dirname, "src"), "node_modules" ]
   },
   plugins: [
+    new MiniCssExtractPlugin({
+      filename: "[name].[contenthash].css",
+      chunkFilename: "[id].[contenthash].css"
+    }),
     new HtmlWebpackPlugin({
+      publicPath: "./",
       template: "src/index.html"
     }),
     new ForkTsCheckerWebpackPlugin({
@@ -87,7 +98,14 @@ const config: Configuration = {
       extensions: [ "js", "jsx", "ts", "tsx" ]
     }),
     new CleanWebpackPlugin()
-  ]
+  ],
+  optimization: {
+    splitChunks: {
+      // include all types of chunks
+      chunks: "all"
+    }
+  },
+  devtool: "source-map"
 };
 
 export default config;

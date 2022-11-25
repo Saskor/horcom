@@ -31,7 +31,11 @@ export const SearchPageListItem = ({
           </a>
         </div>
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-        <div className={cn(styles.infoRow)} onClick={copyText} role="button">
+        <div
+          className={cn(styles.infoRow)}
+          onClick={copyText}
+          role="button" tabIndex={0}
+        >
           Хештег для размещения отзыва в VK: {dataItem.reviewsHashtag}
         </div>
         <div className={cn(styles.infoRow)}>

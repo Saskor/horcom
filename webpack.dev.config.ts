@@ -53,14 +53,20 @@ const config: Configuration = {
           {
             loader: "css-loader",
             options: {
+              sourceMap: true,
               importLoaders: 1,
               modules: {
                 localIdentName: "[name]__[local]--[hash:base64:5]"
               }
             }
           },
-          // Compiles Sass to CSS
-          "sass-loader"
+          {
+            // Compiles Sass to CSS
+            loader: "sass-loader",
+            options: {
+              sourceMap: true
+            }
+          }
         ]
       },
       {

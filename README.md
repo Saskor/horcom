@@ -1,2 +1,4 @@
-# react-typescript-eslint-webpack
-Webpack template for a React app with TypeScript and ESLint
+# Terms of use
+
+1 Ввести в форму поиска текст, например "ремонт спецтехники", регион, город (не обязательно).
+

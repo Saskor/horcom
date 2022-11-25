@@ -16,7 +16,7 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
     MenuItemComponent?: MenuItemComponentType;
     fieldName: string;
     formValues: { [key: string]: any };
-    onFieldChange: (fieldName: string, value: Option) => void;
+    onFieldChange: (changingFieldName: string, value: Option) => void;
   }
 ) => {
   const onChange = React.useCallback(

@@ -88,10 +88,8 @@ export class SelectService<Option extends StandardOption>
 
   onSelectControlKeyDown = (e: React.KeyboardEvent) => {
     const {
-      userInput,
       activeMenuItemIndex,
-      dropdownMenuItemsData = [],
-      value
+      dropdownMenuItemsData = []
     } = this.state;
 
     const { onChange: onChangeCallback } = this.functionsFromParams;
