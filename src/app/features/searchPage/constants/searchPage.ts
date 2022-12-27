@@ -1,3 +1,5 @@
+import { StandardOption } from "../../../shared/componentsStateServices/ServiceBase";
+
 export const REGIONS: {[index: number]: string} = {
   1: "Республика Адыгея",
   2: "Республика Башкортостан",
@@ -94,14 +96,59 @@ export const REGIONS: {[index: number]: string} = {
   95: "Чеченская республика",
   96: "Свердловская область"
 };
+
+export type SearchablePlace = {
+  name: string;
+  regionDistrict: string | null;
+  region: string;
+} & StandardOption;
+
+export type SearchablePlaceSuggestion = {
+  displayPriority: number; /** Number from 1 and bigger*/
+} & SearchablePlace;
+
+export const SEARCHABLE_PLACES: Array<SearchablePlaceSuggestion> = [
+  {
+    name: "Москва",
+    regionDistrict: null,
+    region: "Москва",
+    displayPriority: 1
+  },
+  {
+    name: "Московская область",
+    regionDistrict: null,
+    region: "Московская область",
+    displayPriority: 2
+  },
+  {
+    name: "Электросталь",
+    regionDistrict: null,
+    region: "Московская область",
+    displayPriority: 3
+
+  },
+  {
+    name: "Ногинск",
+    regionDistrict: null,
+    region: "Московская область",
+    displayPriority: 3
+  },
+  {
+    name: "Ликино-Дулево",
+    regionDistrict: null,
+    region: "Московская область",
+    displayPriority: 3
+  }
+];
+
 export const VK_DOMAIN = "https://vk.com/";
 // __hashTag__ it is any hashtag without # symbol
 export const VK_SEARCH_REVIEWS_PAGE = "https://vk.com/search?c%5Bper_page%5D=40&c%5Bq%5D=%23__hashTag__&c%5Bsection%5D=statuses";
 export type ServicesProviderOrManufacturer = {
   id: number;
   name: string;
-  regionId: number;
-  city: string;
+  searchablePlace: SearchablePlace;
+  address: string;
   subcategories: {[key: string]: boolean};
   category: string;
   vkProfile: string;
@@ -114,8 +161,12 @@ export const SERVICES_PRODUCERS: Array<ServicesProviderOrManufacturer> = [
   {
     id: 1,
     name: "Алексей Ниточкин",
-    regionId: 50,
-    city: "Элекстросталь",
+    searchablePlace: {
+      name: "Электросталь",
+      regionDistrict: null,
+      region: "Московская область"
+    },
+    address: "г. Электросталь, ул. Суворова",
     subcategories: {
       "диагностика автомобилей": true,
       чиптюнинг: true,
@@ -133,8 +184,12 @@ export const SERVICES_PRODUCERS: Array<ServicesProviderOrManufacturer> = [
   {
     id: 2,
     name: "Иванов Иван",
-    regionId: 50,
-    city: "Москва",
+    searchablePlace: {
+      name: "Москва",
+      regionDistrict: null,
+      region: "Москва"
+    },
+    address: "г. Москва, ул. Суворова",
     subcategories: {
       "диагностика автомобилей": true,
       чиптюнинг: true,
@@ -152,8 +207,12 @@ export const SERVICES_PRODUCERS: Array<ServicesProviderOrManufacturer> = [
   {
     id: 3,
     name: "Смирнов Сергей",
-    regionId: 50,
-    city: "Ногинск",
+    searchablePlace: {
+      name: "Ногинск",
+      regionDistrict: null,
+      region: "Московская область"
+    },
+    address: "г. Ногинск, ул. Суворова",
     subcategories: {
       "диагностика автомобилей": true,
       чиптюнинг: true,
@@ -171,8 +230,12 @@ export const SERVICES_PRODUCERS: Array<ServicesProviderOrManufacturer> = [
   {
     id: 4,
     name: "Алексей Ниточкин",
-    regionId: 50,
-    city: "Ликино-Дулево",
+    searchablePlace: {
+      name: "Ликино-Дулево",
+      regionDistrict: null,
+      region: "Московская область"
+    },
+    address: "г. Ликино-Дулево, ул. Суворова",
     subcategories: {
       "диагностика автомобилей": true,
       чиптюнинг: true,

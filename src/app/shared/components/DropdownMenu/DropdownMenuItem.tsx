@@ -10,6 +10,7 @@ type MenuItemProps<Option extends StandardOption> = {
   onMenuItemClick: (menuItemData: Option) => void;
   onMenuItemMouseEnter: (menuItemIndex: number) => void;
   onMenuItemMouseMove: (menuItemIndex: number) => void;
+  getLabel: (newValue: Option) => string;
 }
 
 export const DropdownMenuItem = <Option extends StandardOption, >(
@@ -20,7 +21,8 @@ export const DropdownMenuItem = <Option extends StandardOption, >(
     onMenuItemMouseEnter,
     onMenuItemMouseMove,
     itemClassName,
-    MenuItemComponent
+    MenuItemComponent,
+    getLabel
   }: MenuItemProps<Option>
 ) => {
   const onItemMouseMove = useMemo(
@@ -36,6 +38,14 @@ export const DropdownMenuItem = <Option extends StandardOption, >(
     [ onMenuItemClick, menuItemData ]
   );
 
+  const getMenuItemChildren = () => {
+    if (MenuItemComponent) {
+      return <MenuItemComponent menuItemData={menuItemData} />;
+    }
+
+    return getLabel(menuItemData);
+  };
+
   return (
     // eslint-disable-next-line max-len
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
@@ -46,7 +56,7 @@ export const DropdownMenuItem = <Option extends StandardOption, >(
       onMouseEnter={onItemMouseEnter}
       onMouseMove={onItemMouseMove}
     >
-      {MenuItemComponent ? <MenuItemComponent menuItemData={menuItemData} /> : menuItemData.label}
+      {getMenuItemChildren()}
     </li>
   );
 };

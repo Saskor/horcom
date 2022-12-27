@@ -114,6 +114,12 @@ export abstract class ControlWithDropDownMenu<Option extends StandardOption>
     onChangeCallback(menuItem);
   };
 
+  private getUserInput(dropDownMenuItemData: Option): string {
+    const { getLabel } = this.functionsFromParams;
+
+    return getLabel(dropDownMenuItemData);
+  }
+
   public onControlKeyDown(
     {
       eventKey,
@@ -148,7 +154,9 @@ export abstract class ControlWithDropDownMenu<Option extends StandardOption>
       if (activeMenuItemIndex === 0) {
         this.setState({
           activeMenuItemIndex: dropdownMenuItemsData.length - 1,
-          userInput: dropdownMenuItemsData[dropdownMenuItemsData.length - 1].label,
+          userInput: this.getUserInput(
+            dropdownMenuItemsData[dropdownMenuItemsData.length - 1]
+          ),
           menuItemsHover: false
         });
 
@@ -160,8 +168,8 @@ export abstract class ControlWithDropDownMenu<Option extends StandardOption>
           ? dropdownMenuItemsData.length - 1
           : activeMenuItemIndex - 1,
         userInput: activeMenuItemIndex === null
-          ? dropdownMenuItemsData[dropdownMenuItemsData.length - 1].label
-          : dropdownMenuItemsData[activeMenuItemIndex - 1].label,
+          ? this.getUserInput(dropdownMenuItemsData[dropdownMenuItemsData.length - 1])
+          : this.getUserInput(dropdownMenuItemsData[activeMenuItemIndex - 1]),
         menuItemsHover: false
       });
     }
@@ -171,7 +179,7 @@ export abstract class ControlWithDropDownMenu<Option extends StandardOption>
       if (activeMenuItemIndex === dropdownMenuItemsData.length - 1) {
         this.setState({
           activeMenuItemIndex: 0,
-          userInput: dropdownMenuItemsData[0].label,
+          userInput: this.getUserInput(dropdownMenuItemsData[0]),
           menuItemsHover: false
         });
 
@@ -183,8 +191,8 @@ export abstract class ControlWithDropDownMenu<Option extends StandardOption>
           ? 0
           : activeMenuItemIndex + 1,
         userInput: activeMenuItemIndex === null
-          ? dropdownMenuItemsData[0].label
-          : dropdownMenuItemsData[activeMenuItemIndex + 1].label,
+          ? this.getUserInput(dropdownMenuItemsData[0])
+          : this.getUserInput(dropdownMenuItemsData[activeMenuItemIndex + 1]),
         menuItemsHover: false
       });
     }

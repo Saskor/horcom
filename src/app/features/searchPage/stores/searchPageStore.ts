@@ -1,5 +1,10 @@
 import { makeAutoObservable } from "mobx";
-import { REGIONS, SERVICES_PRODUCERS, ServicesProviderOrManufacturer } from "../constants/searchPage";
+import {
+  SEARCHABLE_PLACES,
+  SearchablePlace,
+  SERVICES_PRODUCERS,
+  ServicesProviderOrManufacturer
+} from "../constants/searchPage";
 
 type CategoriesWithSubcategories = {
   // category
@@ -22,7 +27,7 @@ export type CategoriesSelectorOption = {
   value: string;
 }
 
-export type FilterFormValue = {
+export type FilterFormField = {
   label: string;
   value: string | number | null;
   dependentFields?: {
@@ -31,20 +36,13 @@ export type FilterFormValue = {
 };
 
 type FilterFormValues = {
-  category: FilterFormValue;
-  subcategory: FilterFormValue;
-  regionId: FilterFormValue;
-  city: FilterFormValue;
+  category: FilterFormField;
+  subcategory: FilterFormField;
+  searchablePlace: SearchablePlace;
 }
 
 class SearchPageStoreClass {
   private categoriesWithSubcategories: CategoriesWithSubcategories = {}
-
-  public categoriesSelectorOptions: Array<CategoriesSelectorOption> = []
-
-  public regionsOptions: Array<FilterFormValue> = []
-
-  public citiesOptions: Array<FilterFormValue> = []
 
   public filterFormValues: FilterFormValues = {
     category: {
@@ -55,13 +53,30 @@ class SearchPageStoreClass {
       label: "",
       value: null
     },
-    regionId: {
-      label: "Москва",
-      value: 50
+    searchablePlace: {
+      name: "Москва",
+      regionDistrict: null,
+      region: "Москва"
+    }
+  }
+
+  private requestParamsValueGetters: {
+    [key: string]: { getValue: (param: FilterFormField | SearchablePlace) => string | number | null | undefined };
+  } = {
+    category: {
+      getValue: param => param.value
     },
-    city: {
-      label: "Москва",
-      value: "Москва"
+    subcategory: {
+      getValue: param => param.value
+    },
+    searchablePlace: {
+      getValue: param => {
+        if ("region" in param) {
+          return this.getSearchablePlaceOptionLabel(param);
+        }
+
+        return param.value || undefined;
+      }
     }
   }
 
@@ -97,14 +112,16 @@ class SearchPageStoreClass {
   )
 
   // init
-  private getCategoriesSelectorOptions = (): Array<CategoriesSelectorOption> => {
-    const categoriesList = Object.keys(this.categoriesWithSubcategories);
-
-    return categoriesList.map(category => ({
-      label: category,
-      value: category
-    }));
-  }
+  /*
+   *private getCategoriesSelectorOptions = (): Array<CategoriesSelectorOption> => {
+   *const categoriesList = Object.keys(this.categoriesWithSubcategories);
+   *
+   *return categoriesList.map(category => ({
+   *  label: category,
+   *  value: category
+   *}));
+   *}
+   */
 
   public createSubcategoryOptions = (inputValue: string): Array<SearchSelectOption> => {
     const subcategoryOptionsWithCurrentCategory: Array<SearchSelectOption> = [];
@@ -139,30 +156,29 @@ class SearchPageStoreClass {
     return [ ...subcategoryOptionsWithCurrentCategory, ...otherSubcategoryOptions ];
   };
 
-  private getCitiesAutocompleteOptions = (
-    data: Array<ServicesProviderOrManufacturer>
-  ) => (data.map(item => (
-    {
-      label: item.city,
-      value: item.city
-    }
-  )));
+  public getSearchablePlaceOptions = (value: string): Array<SearchablePlace> => (
+    SEARCHABLE_PLACES.filter(
+      ({ name }) => (
+        name.toLocaleLowerCase().includes(value.toLocaleLowerCase())
+      )
+    )
+  )
 
-  private getRegionsOptions = () => Object.keys(REGIONS).map(
-    (regionId): FilterFormValue => ({
-      label: REGIONS[Number(regionId)],
-      value: Number(regionId)
-    })
-  );
+  public getSearchablePlaceOptionLabel = ({ name, regionDistrict, region }: SearchablePlace) => {
+    if (name === region) {
+      return name;
+    }
+
+    const path = regionDistrict ? [ name, regionDistrict, region ] : [ name, region ];
+
+    return path.join(", ");
+  }
 
   private onData = (
     requestParams: FilterFormValues,
     data: Array<ServicesProviderOrManufacturer>
   ): void => {
-    // region ID always an integer bigger than zero
-    if (Number.isInteger(requestParams.regionId.value)) {
-      this.citiesOptions = this.getCitiesAutocompleteOptions(data);
-    }
+    console.log(requestParams, data);
   }
 
   public requestData = (
@@ -175,25 +191,36 @@ class SearchPageStoreClass {
         // eslint-disable-next-line guard-for-in
         for (requestParamName in requestParams) {
           const requestParam = requestParams[requestParamName];
+          const valueFromRequestParam = this.requestParamsValueGetters[requestParamName].getValue(requestParam);
 
-          if (requestParam.value === null) {
+          if (valueFromRequestParam === null) {
             allConditionsTruthy = true;
             continue;
           }
 
           switch (requestParamName) {
           case "subcategory":
-            if (typeof requestParam.value === "string") {
+            if (typeof valueFromRequestParam === "string") {
               let subcategory: string;
               // eslint-disable-next-line guard-for-in
               for (subcategory in serviceProducer.subcategories) {
-                allConditionsTruthy = subcategory.toLowerCase().includes(requestParam.value.toLowerCase());
+                allConditionsTruthy = subcategory.toLowerCase().includes(valueFromRequestParam.toLowerCase());
 
                 if (allConditionsTruthy) {
                   break;
                 }
               }
             }
+            break;
+
+          case "searchablePlace":
+            if ("region" in requestParam) {
+              const needToFilterByWholeRegion: boolean = valueFromRequestParam === requestParam.region;
+              allConditionsTruthy = needToFilterByWholeRegion
+                ? valueFromRequestParam === serviceProducer[requestParamName].region
+                : valueFromRequestParam === this.getSearchablePlaceOptionLabel(serviceProducer[requestParamName]);
+            }
+
             break;
 
           default:
@@ -264,8 +291,6 @@ class SearchPageStoreClass {
 
   public init = () => {
     this.categoriesWithSubcategories = this.getCategoriesWithSubcategories(SERVICES_PRODUCERS);
-    this.categoriesSelectorOptions = this.getCategoriesSelectorOptions();
-    this.regionsOptions = this.getRegionsOptions();
   }
 }
 

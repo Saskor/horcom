@@ -20,7 +20,9 @@ export const Autocomplete = <Option extends StandardOption, >(
     MenuItemComponent,
     dropdownMenuPortalTargetId,
     onChange,
-    value
+    value,
+    getLabel = (dataItem: Option) => dataItem.label || "",
+    placeholder = ""
   }: {
     getFilteredSuggestions?: (inputValue: string) => Array<Option>;
     suggestions?: Array<Option>;
@@ -28,6 +30,8 @@ export const Autocomplete = <Option extends StandardOption, >(
     dropdownMenuPortalTargetId: string;
     onChange: (newValue: Option) => void;
     value: Option;
+    getLabel?: (newValue: Option) => string;
+    placeholder?: string,
   }
 ) => {
   const containerRef = useRef(null);
@@ -46,7 +50,8 @@ export const Autocomplete = <Option extends StandardOption, >(
           onChange,
           containerRef,
           MenuItemComponent,
-          value
+          value,
+          getLabel
         }
       }
     ) as AutocompleteService<Option>;
@@ -54,7 +59,7 @@ export const Autocomplete = <Option extends StandardOption, >(
   useEffect(() => {
     Service.handleUpdate({
       value,
-      userInput: value.label
+      userInput: getLabel(value)
     });
   }, [ value ]);
 
@@ -77,6 +82,7 @@ export const Autocomplete = <Option extends StandardOption, >(
           onKeyDown={Service.onAutocompleteControlKeyDown}
           // onBlur={onControlBlur}
           value={Service.state.userInput}
+          placeholder={placeholder}
         />
       </div>
       {Service.state.showDropdownMenu && (
@@ -92,6 +98,7 @@ export const Autocomplete = <Option extends StandardOption, >(
             onMenuItemMouseMove={Service.onMenuItemMouseMove}
             onMenuMouseLeave={Service.onMenuMouseLeave}
             menuStyles={Service.state.menuStyles}
+            getLabel={getLabel}
           />
         </Portal>
       )}

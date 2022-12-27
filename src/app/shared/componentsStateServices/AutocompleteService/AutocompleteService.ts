@@ -9,6 +9,7 @@ export type AutocompleteServiceParams<Option> = {
   MenuItemComponent?: MenuItemComponentType;
   onChange: (newValue: Option) => void;
   containerRef: RefObject<HTMLDivElement>;
+  getLabel: (item: Option) => string;
   value: Option;
 };
 
@@ -35,11 +36,13 @@ export class AutocompleteService<Option extends StandardOption>
   private getFunctionsFromParams = ({
     getFilteredSuggestions,
     MenuItemComponent,
-    onChange
+    onChange,
+    getLabel
   }: AutocompleteServiceParams<Option>) => ({
     getFilteredSuggestions,
     MenuItemComponent,
-    onChange
+    onChange,
+    getLabel
   })
 
   private getInitialState = (params: AutocompleteServiceParams<Option>): {
@@ -59,7 +62,7 @@ export class AutocompleteService<Option extends StandardOption>
     menuItemsHover: true,
     filteredSuggestions: [],
     containerRef: params.containerRef,
-    userInput: params.value.label || "",
+    userInput: params.getLabel(params.value),
     value: params.value,
     suggestions: params.suggestions
   })
@@ -87,9 +90,12 @@ export class AutocompleteService<Option extends StandardOption>
     const filteredSuggestions = typeof getFilteredSuggestions === "function" && !suggestions.length
       ? getFilteredSuggestions(userInput)
       : suggestions.filter(
-        ({ label }: Option) => (
-          label.toLowerCase().includes(userInput.toLowerCase())
-        )
+        (suggestion: Option) => {
+          const { getLabel } = this.functionsFromParams;
+
+          return getLabel(suggestion).toLowerCase().
+            includes(userInput.toLowerCase());
+        }
       );
 
     this.setState({

@@ -20,13 +20,15 @@ export const Select = <Option extends StandardOption, >(
     MenuItemComponent,
     dropdownMenuPortalTargetId,
     onChange,
-    value
+    value,
+    getLabel = (dataItem: Option) => dataItem.label || ""
   }: {
     dropdownMenuItemsData: Array<Option>;
     MenuItemComponent?: MenuItemComponentType;
     dropdownMenuPortalTargetId: string;
     onChange: (newValue: Option) => void;
     value: Option;
+    getLabel?: (newValue: Option) => string;
   }
 ) => {
   const containerRef = useRef(null);
@@ -44,7 +46,8 @@ export const Select = <Option extends StandardOption, >(
           MenuItemComponent,
           onChange,
           containerRef,
-          value
+          value,
+          getLabel
         }
       }
     ) as SelectService<Option>;
@@ -75,7 +78,7 @@ export const Select = <Option extends StandardOption, >(
           // onBlur={onControlBlur}
           onClick={Service.onSelectClick}
         >
-          {Service.state.value.label}
+          {getLabel(Service.state.value)}
           <FaChevronDown />
         </button>
       </div>
@@ -92,6 +95,7 @@ export const Select = <Option extends StandardOption, >(
             onMenuItemMouseMove={Service.onMenuItemMouseMove}
             onMenuMouseLeave={Service.onMenuMouseLeave}
             menuStyles={Service.state.menuStyles}
+            getLabel={getLabel}
           />
         </Portal>
       )}

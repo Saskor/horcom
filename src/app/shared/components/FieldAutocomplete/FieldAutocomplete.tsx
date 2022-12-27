@@ -9,7 +9,9 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
     MenuItemComponent,
     fieldName,
     formValues,
-    onFieldChange
+    onFieldChange,
+    getLabel,
+    placeholder = ""
   }: {
     getFilteredSuggestions?: (inputValue: string) => Array<Option>;
     suggestions?: Array<Option>;
@@ -17,6 +19,8 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
     fieldName: string;
     formValues: { [key: string]: any };
     onFieldChange: (changingFieldName: string, value: Option) => void;
+    getLabel?: (newValue: Option) => string;
+    placeholder?: string;
   }
 ) => {
   const onChange = React.useCallback(
@@ -33,6 +37,8 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
       MenuItemComponent={MenuItemComponent}
       onChange={onChange}
       value={formValues[fieldName]}
+      getLabel={getLabel}
+      placeholder={placeholder}
     />
   );
 };

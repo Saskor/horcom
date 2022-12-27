@@ -7,6 +7,7 @@ export type SelectServiceParams<Option> = {
   MenuItemComponent?: MenuItemComponentType;
   onChange: (newValue: Option) => void;
   containerRef: RefObject<HTMLDivElement>;
+  getLabel: (item: Option) => string;
   value: Option;
 }
 
@@ -32,10 +33,12 @@ export class SelectService<Option extends StandardOption>
 
   private getFunctionsFromParams = ({
     MenuItemComponent,
-    onChange
+    onChange,
+    getLabel
   }: SelectServiceParams<Option>) => ({
     MenuItemComponent,
-    onChange
+    onChange,
+    getLabel
   })
 
   private getInitialState = (params: SelectServiceParams<Option>): {

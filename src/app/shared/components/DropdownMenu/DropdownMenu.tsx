@@ -14,6 +14,7 @@ type Props<Option extends StandardOption> = {
   onMenuItemClick: (menuItem: Option) => void;
   onMenuItemMouseEnter: (menuItemIndex: number) => void;
   onMenuItemMouseMove: (menuItemIndex: number) => void;
+  getLabel: (newValue: Option) => string;
 };
 
 export const DropdownMenu = <Option extends StandardOption, >(
@@ -26,7 +27,8 @@ export const DropdownMenu = <Option extends StandardOption, >(
     onMenuItemMouseEnter,
     onMenuItemMouseMove,
     menuStyles,
-    MenuItemComponent
+    MenuItemComponent,
+    getLabel
   }: Props<Option>
 ) => (
     menuItemsData && Boolean(menuItemsData.length)
@@ -38,7 +40,7 @@ export const DropdownMenu = <Option extends StandardOption, >(
         >
           {menuItemsData.map((menuItemData, index) => (
             <DropdownMenuItem<Option>
-                key={menuItemData.label}
+                key={getLabel(menuItemData)}
                 {...{
                   menuItemData,
                   index,
@@ -51,7 +53,8 @@ export const DropdownMenu = <Option extends StandardOption, >(
                     [styles.suggestionNoHover]: !menuItemsHover,
                     [styles.suggestion]: menuItemsHover
                   })),
-                  MenuItemComponent
+                  MenuItemComponent,
+                  getLabel
                 }}
               />
             ))}

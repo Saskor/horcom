@@ -8,13 +8,15 @@ export const FieldSelect = <Option extends StandardOption, >(
     fieldName,
     formValues,
     onFieldChange,
-    MenuItemComponent
+    MenuItemComponent,
+    getLabel
   }: {
     dropdownMenuItemsData: Array<Option>;
     fieldName: string;
     formValues: { [key: string]: any };
     onFieldChange: (changingFieldName: string, value: Option) => void;
     MenuItemComponent?: MenuItemComponentType;
+    getLabel?: (newValue: Option) => string;
   }
 ) => {
   const onChange = React.useCallback(
@@ -29,6 +31,7 @@ export const FieldSelect = <Option extends StandardOption, >(
     onChange={onChange}
     value={formValues[fieldName]}
     MenuItemComponent={MenuItemComponent}
+    getLabel={getLabel}
   />
   );
 };

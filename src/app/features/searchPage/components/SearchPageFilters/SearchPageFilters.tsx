@@ -1,9 +1,9 @@
 import React from "react";
 import cn from "classnames";
 import { observer } from "mobx-react";
-import { SearchPageStoreType, FilterFormValue, SearchSelectOption } from "../../stores/searchPageStore";
-import { FieldSelect } from "../../../../shared/components/FieldSelect";
+import { SearchPageStoreType, FilterFormField } from "../../stores/searchPageStore";
 import { FieldAutocomplete } from "../../../../shared/components/FieldAutocomplete";
+import { SearchablePlace } from "../../constants/searchPage";
 import styles from "./SearchPageFilters.scss";
 
 export const SearchPageFilters = observer((
@@ -16,40 +16,30 @@ export const SearchPageFilters = observer((
   const {
     init,
     createSubcategoryOptions,
-    categoriesSelectorOptions,
+    getSearchablePlaceOptions,
     filterFormValues,
     onChangeFilterFormValue,
-    regionsOptions,
-    citiesOptions
+    getSearchablePlaceOptionLabel
   } = searchPageStore;
 
   React.useEffect(() => init(), [ init ]);
 
   return (
     <div className={cn(styles.container)}>
-      <FieldSelect<FilterFormValue>
-        dropdownMenuItemsData={categoriesSelectorOptions}
-        fieldName="category"
-        formValues={filterFormValues}
-        onFieldChange={onChangeFilterFormValue}
-      />
-      <FieldAutocomplete<SearchSelectOption>
+      <FieldAutocomplete<FilterFormField>
         getFilteredSuggestions={createSubcategoryOptions}
         fieldName="subcategory"
         formValues={filterFormValues}
         onFieldChange={onChangeFilterFormValue}
+        placeholder="Что искать"
       />
-      <FieldAutocomplete<FilterFormValue>
-        suggestions={regionsOptions}
-        fieldName="regionId"
+      <FieldAutocomplete<SearchablePlace>
+        getFilteredSuggestions={getSearchablePlaceOptions}
+        fieldName="searchablePlace"
         formValues={filterFormValues}
         onFieldChange={onChangeFilterFormValue}
-      />
-      <FieldAutocomplete<FilterFormValue>
-        suggestions={citiesOptions}
-        fieldName="city"
-        formValues={filterFormValues}
-        onFieldChange={onChangeFilterFormValue}
+        getLabel={getSearchablePlaceOptionLabel}
+        placeholder="Где искать"
       />
     </div>
   );

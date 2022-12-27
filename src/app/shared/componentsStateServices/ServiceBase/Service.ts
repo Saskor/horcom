@@ -2,8 +2,8 @@ import { ReactElement } from "react";
 import { Subject, Subscription } from "rxjs";
 
 export type StandardOption = {
-  label: string;
-  value: string | number | null;
+  label?: string;
+  value?: string | number | null;
   disabled?: boolean;
 };
 
