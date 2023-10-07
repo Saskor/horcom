@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useRef } from "react";
 import cn from "classnames";
+import { FiCopy } from "react-icons/fi";
 import { ServicesProviderOrManufacturer, VK_SEARCH_REVIEWS_PAGE } from "../../constants/searchPage";
+import { Tooltip } from "../../../../shared/components/Tooltip";
+import { E_TOOLTIP_PLACEMENT } from "../../../../shared/constants/tooltip";
 import styles from "./SearchPageListItem.scss";
 import TextHelper from "app/shared/services/text";
 
@@ -11,6 +14,8 @@ export const SearchPageListItem = ({
     () => TextHelper.copyTextToClipboard(dataItem.reviewsHashtag),
     [ dataItem.reviewsHashtag ]
   );
+
+  const hashtagRef = useRef(null);
 
   return (
     <div className={cn(styles.container)}>
@@ -36,7 +41,13 @@ export const SearchPageListItem = ({
           onClick={copyText}
           role="button" tabIndex={0}
         >
-          Хештег для размещения отзыва в VK: {dataItem.reviewsHashtag}
+          Хештег для размещения отзыва в VK: <span>{dataItem.reviewsHashtag}</span>
+          <Tooltip
+            text="Копировать хештег"
+            tooltipTargetRef={hashtagRef}
+            tooltipPlacement={E_TOOLTIP_PLACEMENT.BOTTOM}
+          />
+          <div className={cn(styles.flipHorizontal)} ref={hashtagRef}><FiCopy /></div>
         </div>
         <div className={cn(styles.infoRow)}>
           {"Отзывы в VK: "}

@@ -26,7 +26,6 @@ export const FieldSelect = <Option extends StandardOption, >(
 
   return (
     <Select<Option>
-    dropdownMenuPortalTargetId="portal-root"
     dropdownMenuItemsData={dropdownMenuItemsData}
     onChange={onChange}
     value={formValues[fieldName]}

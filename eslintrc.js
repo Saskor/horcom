@@ -153,8 +153,6 @@ module.exports = {
     "array-callback-return": "error",
     "consistent-return": "error",
     curly: [ "error", "all" ],
-    "default-case": "error",
-    "default-case-last": "error",
     "dot-location": "error",
     "dot-notation": "error",
     eqeqeq: "error",
@@ -204,7 +202,8 @@ module.exports = {
 
     // Variables
     "no-label-var": "error",
-    "no-shadow": "error",
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": [ "error" ],
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": [ "error" ],
 
@@ -223,7 +222,7 @@ module.exports = {
     "function-call-argument-newline": [ "error", "consistent" ],
     "function-paren-newline": [ "error", "consistent" ],
     "implicit-arrow-linebreak": [ "error", "beside" ],
-    indent: [ "error", 2, { ignoredNodes: [ "JSXElement *", "JSXElement" ] } ],
+    indent: [ "error", 2, { ignoredNodes: [ "JSXElement *", "JSXElement" ], SwitchCase: 1 } ],
     "jsx-quotes": [ "error", "prefer-double" ],
     "key-spacing": [ "error", { beforeColon: false } ],
     "keyword-spacing": [ "error", { before: true, after: true } ],

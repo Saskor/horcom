@@ -1,6 +1,6 @@
 import cn from "classnames";
-import React, { CSSProperties } from "react";
-import { StandardOption, MenuItemComponentType } from "../../componentsStateServices/ServiceBase";
+import React, { CSSProperties, FC } from "react";
+import { StandardOption } from "../../componentsStateServices/types";
 import styles from "./DropdownMenu.scss";
 import { DropdownMenuItem } from "./DropdownMenuItem";
 
@@ -9,7 +9,7 @@ type Props<Option extends StandardOption> = {
   menuItemsHover: boolean;
   activeSuggestionIndex: number | null,
   menuStyles: CSSProperties;
-  MenuItemComponent?: MenuItemComponentType;
+  MenuItemComponent?: FC<{menuItemData: Option}>;
   onMenuMouseLeave?: () => void;
   onMenuItemClick: (menuItem: Option) => void;
   onMenuItemMouseEnter: (menuItemIndex: number) => void;
@@ -34,7 +34,7 @@ export const DropdownMenu = <Option extends StandardOption, >(
     menuItemsData && Boolean(menuItemsData.length)
       ? (
         <ul
-          style={menuStyles}
+          style={menuStyles as CSSProperties}
           className={cn(styles.suggestions)}
           onMouseLeave={onMenuMouseLeave}
         >
@@ -62,7 +62,7 @@ export const DropdownMenu = <Option extends StandardOption, >(
       )
       : (
         <div
-          style={menuStyles}
+          style={menuStyles as CSSProperties}
           className={cn(styles["no-suggestions"])}
         >
           <em>No suggestions, you&apos;re on your own!</em>

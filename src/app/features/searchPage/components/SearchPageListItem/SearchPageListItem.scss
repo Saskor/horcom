@@ -45,3 +45,9 @@
 .infoRow {
   margin-bottom: 5px;
 }
+
+.flipHorizontal {
+  transform: scale(-1, 1);
+  display: inline-block;
+  margin-left: 5px;
+}

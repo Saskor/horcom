@@ -1,11 +1,18 @@
 import { CSSProperties, RefObject } from "react";
-import { StandardOption, ServiceBase } from "../ServiceBase";
+import { StandardOption } from "../types";
+
+type ControlWithDropDownMenuState = {
+  activeMenuItemIndex: null | number;
+  menuStyles: CSSProperties;
+  menuItemsHover: boolean;
+  userInput: string;
+};
+
 
 export type ControlWithDropDownMenuType<Option> = {
   handleMount: () => void;
   handleUnmount: () => void;
   onControlBlur: () => void;
-  closeMenu: () => void;
   onMenuItemClick: (suggestion: Option, onChangeCallback: (value: Option) => void) => void;
   onMenuItemMouseMove: (menuItemIndex: number) => void;
   onMenuItemMouseEnter: (menuItemIndex: number) => void;
@@ -23,59 +30,81 @@ export type ControlWithDropDownMenuType<Option> = {
   setMenuStyles: (containerRef: RefObject<HTMLDivElement>) => CSSProperties;
 }
 
-export abstract class ControlWithDropDownMenu<Option extends StandardOption>
-  extends ServiceBase
-  implements ControlWithDropDownMenuType<Option>{
-  protected constructor() {
-    super();
+export type ControlWithDropDownMenuParamsType<
+    Option,
+    ComponentState extends ControlWithDropDownMenuState
+> = {
+  componentStateManageHelpers: {
+    getComponentState: () => ControlWithDropDownMenuState,
+    setComponentState: (newStatePart: Partial<ControlWithDropDownMenuState>) => void,
+  };
+  serviceCallbacks: {
+    getFilteredSuggestions: (inputValue: string) => Array<Option>;
+    onChange: (newValue: Option) => void;
+    getLabel: (newValue: Option) => string;
+  };
+  refs: {containerRef: RefObject<HTMLDivElement>};
+  initialState: ComponentState;
+};
+
+export class ControlWithDropDownMenu<
+  Option extends StandardOption,
+  ComponentState extends ControlWithDropDownMenuState
+  >
+implements ControlWithDropDownMenuType<Option>{
+  private readonly setState;
+
+  private readonly getState;
+
+  private readonly serviceCallbacks;
+
+  private readonly refs;
+  
+  private readonly onCloseMenu;
+
+  constructor(
+    {
+      componentStateManageHelpers,
+      serviceCallbacks,
+      refs,
+      initialState
+    }: ControlWithDropDownMenuParamsType<Option, ComponentState>
+  ) {
+    this.setState = componentStateManageHelpers.setComponentState;
+    this.getState = componentStateManageHelpers.getComponentState;
+    this.serviceCallbacks = serviceCallbacks;
+    this.refs = refs;
+    
+    this.onCloseMenu = () => this.setState(initialState);
 
     this.handleMount = this.handleMount.bind(this);
     this.handleUnmount = this.handleUnmount.bind(this);
     this.onControlBlur = this.onControlBlur.bind(this);
-    this.closeMenu = this.closeMenu.bind(this);
     this.onMenuItemClick = this.onMenuItemClick.bind(this);
     this.onMenuItemMouseMove = this.onMenuItemMouseMove.bind(this);
     this.onMenuItemMouseEnter = this.onMenuItemMouseEnter.bind(this);
     this.setMenuStyles = this.setMenuStyles.bind(this);
   }
 
-  private handleScroll() {
-    if (this.state.showDropdownMenu) {
-      this.setState({
-        showDropdownMenu: false
-      });
-    }
-  }
-
   public handleMount() {
-    window.addEventListener("scroll", this.handleScroll);
+    window.addEventListener("scroll", this.onCloseMenu);
+    window.addEventListener("resize", this.onCloseMenu);
   }
 
   public handleUnmount() {
-    window.removeEventListener("scroll", this.handleScroll);
+    window.removeEventListener("scroll", this.onCloseMenu);
+    window.removeEventListener("resize", this.onCloseMenu);
   }
 
   public onControlBlur() {
-    this.closeMenu();
-  }
-
-  public closeMenu() {
-    this.setState({
-      activeMenuItemIndex: null,
-      showDropdownMenu: false,
-      menuItemsHover: true,
-      ...(
-        this.state.filteredSuggestions && this.state.filteredSuggestions.length
-          ? { filteredSuggestions: [] }
-          : {}
-      )
-    });
+    this.onCloseMenu();
   }
 
   onMenuItemMouseMove(menuItemIndex: number) {
+    const state = this.getState();
 
-    const { activeMenuItemIndex } = this.state;
-    if (!this.state.menuItemsHover) {
+    const { activeMenuItemIndex } = state;
+    if (!state.menuItemsHover) {
       this.setState({
         menuItemsHover: true
       });
@@ -89,13 +118,14 @@ export abstract class ControlWithDropDownMenu<Option extends StandardOption>
   }
 
   onMenuItemMouseEnter(menuItemIndex: number) {
-    if (!this.state.menuItemsHover) {
+    const state = this.getState();
+    if (!state.menuItemsHover) {
       this.setState({
         menuItemsHover: true
       });
     }
 
-    if (menuItemIndex !== this.state.activeMenuItemIndex) {
+    if (menuItemIndex !== state.activeMenuItemIndex) {
       this.setState({
         activeMenuItemIndex: menuItemIndex
       });
@@ -109,13 +139,13 @@ export abstract class ControlWithDropDownMenu<Option extends StandardOption>
       return;
     }
 
-    this.closeMenu();
+    this.onCloseMenu();
 
     onChangeCallback(menuItem);
   };
 
   private getUserInput(dropDownMenuItemData: Option): string {
-    const { getLabel } = this.functionsFromParams;
+    const { getLabel } = this.serviceCallbacks;
 
     return getLabel(dropDownMenuItemData);
   }
@@ -139,14 +169,14 @@ export abstract class ControlWithDropDownMenu<Option extends StandardOption>
         return;
       }
 
-      this.closeMenu();
+      this.onCloseMenu();
       onChangeCallback(dropdownMenuItemsData[activeMenuItemIndex]);
 
     }
 
     // User pressed the esc key
     if (eventKey === "Escape") {
-      this.closeMenu();
+      this.onCloseMenu();
     }
 
     // User pressed the up arrow

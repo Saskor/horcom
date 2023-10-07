@@ -1,21 +1,23 @@
 import {
   useRef,
-  useEffect,
-  useLayoutEffect,
-  Dispatch,
-  SetStateAction
+  useEffect
 } from "react";
-import { ServiceBaseType } from "../componentsStateServices/ServiceBase";
 
-export const useComponentService = <ServiceType extends ServiceBaseType, ServiceParams>(
-  {
-    Service,
-    serviceChangeHandler,
-    serviceParams
-  }: {
-  Service: { new(params: ServiceParams): ServiceType; }
-  serviceChangeHandler: Dispatch<SetStateAction<null>>;
-  serviceParams: ServiceParams
+type MountableService = {
+  handleMount: () => void;
+  handleUnmount: () => void;
+}
+
+export const useComponentService = <
+    ServiceType,
+    ServiceParamsType,
+>(
+    {
+      Service,
+      serviceParams
+    }: {
+  Service: { new(serviceParams: ServiceParamsType): ServiceType; };
+  serviceParams: ServiceParamsType;
 }) => {
   const service = useRef<ServiceType>();
 
@@ -23,17 +25,11 @@ export const useComponentService = <ServiceType extends ServiceBaseType, Service
     service.current = new Service(serviceParams) as ServiceType;
   }
 
-  useLayoutEffect(() => {
-    const serviceInstance = service.current as ServiceType;
-    serviceInstance.subscribe(serviceChangeHandler);
-  }, []);
-
   useEffect(() => {
-    const serviceInstance = service.current as ServiceType;
+    const serviceInstance = service.current as ServiceType & MountableService;
     serviceInstance.handleMount();
 
     return (): void => {
-      serviceInstance.unsubscribe();
       serviceInstance.handleUnmount();
     };
   }, []);

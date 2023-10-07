@@ -1,16 +1,16 @@
 import React, { useMemo } from "react";
 import cn from "classnames";
-import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/ServiceBase";
+import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/types";
 
 type MenuItemProps<Option extends StandardOption> = {
   menuItemData: Option;
   index: number;
   itemClassName: string;
-  MenuItemComponent?: MenuItemComponentType;
+  MenuItemComponent?: MenuItemComponentType<Option>;
   onMenuItemClick: (menuItemData: Option) => void;
   onMenuItemMouseEnter: (menuItemIndex: number) => void;
   onMenuItemMouseMove: (menuItemIndex: number) => void;
-  getLabel: (newValue: Option) => string;
+  getLabel?: (newValue: Option) => string;
 }
 
 export const DropdownMenuItem = <Option extends StandardOption, >(

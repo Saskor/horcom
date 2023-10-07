@@ -199,32 +199,32 @@ class SearchPageStoreClass {
           }
 
           switch (requestParamName) {
-          case "subcategory":
-            if (typeof valueFromRequestParam === "string") {
-              let subcategory: string;
-              // eslint-disable-next-line guard-for-in
-              for (subcategory in serviceProducer.subcategories) {
-                allConditionsTruthy = subcategory.toLowerCase().includes(valueFromRequestParam.toLowerCase());
+            case "subcategory":
+              if (typeof valueFromRequestParam === "string") {
+                let subcategory: string;
+                // eslint-disable-next-line guard-for-in
+                for (subcategory in serviceProducer.subcategories) {
+                  allConditionsTruthy = subcategory.toLowerCase().includes(valueFromRequestParam.toLowerCase());
 
-                if (allConditionsTruthy) {
-                  break;
+                  if (allConditionsTruthy) {
+                    break;
+                  }
                 }
               }
-            }
-            break;
+              break;
 
-          case "searchablePlace":
-            if ("region" in requestParam) {
-              const needToFilterByWholeRegion: boolean = valueFromRequestParam === requestParam.region;
-              allConditionsTruthy = needToFilterByWholeRegion
-                ? valueFromRequestParam === serviceProducer[requestParamName].region
-                : valueFromRequestParam === this.getSearchablePlaceOptionLabel(serviceProducer[requestParamName]);
-            }
+            case "searchablePlace":
+              if ("region" in requestParam) {
+                const needToFilterByWholeRegion: boolean = valueFromRequestParam === requestParam.region;
+                allConditionsTruthy = needToFilterByWholeRegion
+                  ? valueFromRequestParam === serviceProducer[requestParamName].region
+                  : valueFromRequestParam === this.getSearchablePlaceOptionLabel(serviceProducer[requestParamName]);
+              }
 
-            break;
+              break;
 
-          default:
-            allConditionsTruthy = serviceProducer[requestParamName] === requestParam.value;
+            default:
+              allConditionsTruthy = serviceProducer[requestParamName] === requestParam.value;
           }
 
           if (!allConditionsTruthy) {
@@ -245,16 +245,16 @@ class SearchPageStoreClass {
     let dependentFields;
 
     switch (fieldName) {
-    case "regionId": {
-      dependentFields = {
-        city: { label: "", value: null }
-      };
+      case "regionId": {
+        dependentFields = {
+          city: { label: "", value: null }
+        };
 
-      break;
-    }
+        break;
+      }
 
-    default:
-      dependentFields = {};
+      default:
+        dependentFields = {};
     }
 
     return dependentFields;

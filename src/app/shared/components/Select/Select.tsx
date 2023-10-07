@@ -25,7 +25,7 @@ export const Select = <Option extends StandardOption, >(
   }: {
     dropdownMenuItemsData: Array<Option>;
     MenuItemComponent?: MenuItemComponentType;
-    dropdownMenuPortalTargetId: string;
+    dropdownMenuPortalTargetId?: string;
     onChange: (newValue: Option) => void;
     value: Option;
     getLabel?: (newValue: Option) => string;

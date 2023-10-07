@@ -143,7 +143,8 @@ export const SEARCHABLE_PLACES: Array<SearchablePlaceSuggestion> = [
 
 export const VK_DOMAIN = "https://vk.com/";
 // __hashTag__ it is any hashtag without # symbol
-export const VK_SEARCH_REVIEWS_PAGE = "https://vk.com/search?c%5Bper_page%5D=40&c%5Bq%5D=%23__hashTag__&c%5Bsection%5D=statuses";
+export const HASHTAG = "__hashTag__";
+export const VK_SEARCH_REVIEWS_PAGE = `https://vk.com/search?c%5Bper_page%5D=40&c%5Bq%5D=%23${HASHTAG}&c%5Bsection%5D=statuses`;
 export type ServicesProviderOrManufacturer = {
   id: number;
   name: string;

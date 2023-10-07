@@ -3,13 +3,13 @@ import { createPortal } from "react-dom";
 
 type Props = {
   children: HTMLElement | ReactElement | undefined;
-  portalRootElementId: string;
+  portalRootElementId?: string;
 }
 
 export const Portal = (
   {
     children,
-    portalRootElementId
+    portalRootElementId = "portal-root"
   }: Props
 ): ReactPortal => {
   const el = React.useRef<HTMLElement>();

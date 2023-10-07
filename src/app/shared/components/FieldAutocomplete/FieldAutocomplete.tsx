@@ -13,7 +13,7 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
     getLabel,
     placeholder = ""
   }: {
-    getFilteredSuggestions?: (inputValue: string) => Array<Option>;
+    getFilteredSuggestions: (inputValue: string) => Array<Option>;
     suggestions?: Array<Option>;
     MenuItemComponent?: MenuItemComponentType;
     fieldName: string;
@@ -31,7 +31,6 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
 
   return (
     <Autocomplete<Option>
-      dropdownMenuPortalTargetId="portal-root"
       getFilteredSuggestions={getFilteredSuggestions}
       suggestions={suggestions}
       MenuItemComponent={MenuItemComponent}

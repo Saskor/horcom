@@ -1,102 +1,94 @@
-import React, { CSSProperties, RefObject } from "react";
+import React, { RefObject } from "react";
 import { debounce } from "../../helpers/customDebounce";
-import { MenuItemComponentType, StandardOption } from "../ServiceBase";
+import { StandardOption } from "../types";
 import { ControlWithDropDownMenu } from "../ControlWithDropDownMenu";
+import { AutocompleteState } from "../../components/Autocomplete/Autocomplete";
 
 export type AutocompleteServiceParams<Option> = {
-  getFilteredSuggestions?: (inputValue: string) => Array<Option>;
-  suggestions?: Array<Option>;
-  MenuItemComponent?: MenuItemComponentType;
-  onChange: (newValue: Option) => void;
-  containerRef: RefObject<HTMLDivElement>;
-  getLabel: (item: Option) => string;
-  value: Option;
+  componentStateManageHelpers: {
+    getComponentState: () => AutocompleteState<Option>,
+    setComponentState: (newStatePart: Partial<AutocompleteState<Option>>) => void,
+  };
+  serviceCallbacks: {
+    getFilteredSuggestions: (inputValue: string) => Array<Option>;
+    onChange: (newValue: Option) => void;
+    getLabel: (newValue: Option) => string;
+  };
+  refs: {containerRef: RefObject<HTMLDivElement>};
+  initialState: AutocompleteState<Option>;
 };
 
 export type AutocompleteServiceType<Option> = {
   handleMount: () => void;
-  handleUpdate: (params: { [param: string]: any }) => void;
   handleUnmount: () => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAutocompleteControlKeyDown: (e: React.KeyboardEvent) => void;
   onMenuItemClick: (menuItem: Option) => void;
   onMenuMouseLeave: () => void;
+
+  /*
+   *getState: () => AutocompleteState<Option>,
+   *setState: (newStatePart: Partial<AutocompleteState<Option>>) => void,
+   *serviceCallbacks: {
+   *getFilteredSuggestions: (inputValue: string) => Array<Option>;
+   *onChange: (newValue: Option) => void;
+   *getLabel?: (newValue: Option) => string;
+   *};
+   *refs: {containerRef: RefObject<HTMLDivElement>};
+   */
+
+  controlWithDropDownMenu: any;
 }
 
 export class AutocompleteService<Option extends StandardOption>
-  extends ControlWithDropDownMenu<Option>
-  implements AutocompleteServiceType<Option> {
-  constructor(private readonly params: AutocompleteServiceParams<Option>) {
-    super();
+implements AutocompleteServiceType<Option> {
+  private readonly setState;
 
-    this.initState(this.getInitialState(this.params));
-    this.setFunctionsFromParams(this.getFunctionsFromParams(this.params));
+  private readonly getState;
+
+  private readonly serviceCallbacks;
+
+  private readonly refs;
+
+  public controlWithDropDownMenu;
+
+  constructor(
+    {
+      componentStateManageHelpers,
+      serviceCallbacks,
+      refs,
+      initialState
+    }: AutocompleteServiceParams<Option>
+  ) {
+    this.setState = componentStateManageHelpers.setComponentState;
+    this.getState = componentStateManageHelpers.getComponentState;
+    this.serviceCallbacks = serviceCallbacks;
+    this.refs = refs;
+
+
+    this.controlWithDropDownMenu = new ControlWithDropDownMenu<Option, AutocompleteState<Option>>(
+      {
+        componentStateManageHelpers,
+        serviceCallbacks,
+        refs,
+        initialState
+      }
+    );
   }
 
-  private getFunctionsFromParams = ({
-    getFilteredSuggestions,
-    MenuItemComponent,
-    onChange,
-    getLabel
-  }: AutocompleteServiceParams<Option>) => ({
-    getFilteredSuggestions,
-    MenuItemComponent,
-    onChange,
-    getLabel
-  })
-
-  private getInitialState = (params: AutocompleteServiceParams<Option>): {
-    activeMenuItemIndex: number | null;
-    showDropdownMenu: boolean;
-    menuStyles: CSSProperties;
-    menuItemsHover: boolean;
-    filteredSuggestions: Array<Option>,
-    containerRef: RefObject<HTMLDivElement>,
-    userInput: string;
-    value: Option;
-    suggestions?: Array<Option>;
-  } => ({
-    activeMenuItemIndex: null,
-    showDropdownMenu: false,
-    menuStyles: this.setMenuStyles(params.containerRef),
-    menuItemsHover: true,
-    filteredSuggestions: [],
-    containerRef: params.containerRef,
-    userInput: params.getLabel(params.value),
-    value: params.value,
-    suggestions: params.suggestions
-  })
-
-  handleMount = () => {
-    super.handleMount();
-
-    this.setMenuStyles(this.params.containerRef);
+  public handleMount = () => {
+    this.controlWithDropDownMenu.handleMount();
   }
 
-  handleUpdate(params: { [p: string]: any }) {
-    super.handleUpdate(params);
-  }
-
-  handleUnmount = () => {
-    super.handleUnmount();
-    this.clearService();
+  public handleUnmount = () => {
+    this.controlWithDropDownMenu.handleUnmount();
   }
 
   private inputChangeCallback = (userInput: string) => {
-    const { getFilteredSuggestions } = this.functionsFromParams;
-    const { suggestions = [] } = this.state;
+    const { getFilteredSuggestions } = this.serviceCallbacks;
 
     // Filter our suggestions that don't contain the user's input
-    const filteredSuggestions = typeof getFilteredSuggestions === "function" && !suggestions.length
-      ? getFilteredSuggestions(userInput)
-      : suggestions.filter(
-        (suggestion: Option) => {
-          const { getLabel } = this.functionsFromParams;
-
-          return getLabel(suggestion).toLowerCase().
-            includes(userInput.toLowerCase());
-        }
-      );
+    const filteredSuggestions = getFilteredSuggestions(userInput);
 
     this.setState({
       showDropdownMenu: Boolean(userInput),
@@ -106,7 +98,7 @@ export class AutocompleteService<Option extends StandardOption>
 
   onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({
-      menuStyles: this.setMenuStyles(this.state.containerRef),
+      menuStyles: this.controlWithDropDownMenu.setMenuStyles(this.refs.containerRef),
       showDropdownMenu: false,
       userInput: e.currentTarget.value
     });
@@ -124,11 +116,11 @@ export class AutocompleteService<Option extends StandardOption>
     const {
       filteredSuggestions,
       activeMenuItemIndex
-    } = this.state;
+    } = this.getState();
 
-    const { onChange: onChangeCallback } = this.functionsFromParams;
+    const { onChange: onChangeCallback } = this.serviceCallbacks;
 
-    this.onControlKeyDown({
+    this.controlWithDropDownMenu.onControlKeyDown({
       eventKey: e.key,
       dropdownMenuItemsData: filteredSuggestions,
       activeMenuItemIndex,
@@ -137,11 +129,11 @@ export class AutocompleteService<Option extends StandardOption>
   };
 
   onMenuItemClick = (menuItem: Option) => {
-    super.onMenuItemClick(menuItem, this.functionsFromParams.onChange);
+    this.controlWithDropDownMenu.onMenuItemClick(menuItem, this.serviceCallbacks.onChange);
   }
 
   onMenuMouseLeave = () => {
-    if (this.state.activeMenuItemIndex === null) {
+    if (this.getState().activeMenuItemIndex === null) {
       return;
     }
 

@@ -1,10 +1,10 @@
 import React, { CSSProperties, RefObject } from "react";
-import { MenuItemComponentType, StandardOption } from "../ServiceBase";
+import { MenuItemComponentType, StandardOption } from "../types";
 import { ControlWithDropDownMenu } from "../ControlWithDropDownMenu";
 
 export type SelectServiceParams<Option> = {
   dropdownMenuItemsData: Array<Option>;
-  MenuItemComponent?: MenuItemComponentType;
+  MenuItemComponent?: MenuItemComponentType<Option>;
   onChange: (newValue: Option) => void;
   containerRef: RefObject<HTMLDivElement>;
   getLabel: (item: Option) => string;
@@ -21,8 +21,18 @@ export type SelectServiceType<Option> = {
   onMenuMouseLeave: () => void;
 }
 
+type SelectServiceState<Option> = {
+  activeMenuItemIndex: number | null;
+  showDropdownMenu: boolean;
+  menuStyles: CSSProperties;
+  menuItemsHover: boolean;
+  dropdownMenuItemsData: Array<Option>,
+  containerRef: RefObject<HTMLDivElement>,
+  value: Option;
+}
+
 export class SelectService<Option extends StandardOption>
-  extends ControlWithDropDownMenu<Option>
+  extends ControlWithDropDownMenu<Option, SelectServiceState<Option>>
   implements SelectServiceType<Option> {
   constructor(private readonly params : SelectServiceParams<Option>) {
     super();
@@ -41,15 +51,7 @@ export class SelectService<Option extends StandardOption>
     getLabel
   })
 
-  private getInitialState = (params: SelectServiceParams<Option>): {
-    activeMenuItemIndex: number | null;
-    showDropdownMenu: boolean;
-    menuStyles: CSSProperties;
-    menuItemsHover: boolean;
-    dropdownMenuItemsData: Array<Option>,
-    containerRef: RefObject<HTMLDivElement>,
-    value: Option;
-  } => ({
+  private getInitialState = (params: SelectServiceParams<Option>): SelectServiceState<Option> => ({
     activeMenuItemIndex: null,
     showDropdownMenu: false,
     menuStyles: this.setMenuStyles(params.containerRef),
