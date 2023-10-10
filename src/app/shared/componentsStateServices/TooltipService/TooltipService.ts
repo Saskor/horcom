@@ -1,5 +1,4 @@
 import { CSSProperties, RefObject } from "react";
-import { ServiceBase } from "../ServiceBase";
 import {
   E_TOOLTIP_PLACEMENT,
   TOOLTIP_HORIZONTAL_PADDING,
@@ -25,8 +24,7 @@ type TooltipServiceState = TooltipServiceParams & {
   showTooltip: boolean
 }
 
-export class TooltipService extends ServiceBase<TooltipServiceState>
-  implements TooltipServiceType {
+export class TooltipService implements TooltipServiceType {
   constructor(private readonly params: TooltipServiceParams) {
     super();
 

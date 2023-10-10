@@ -1,11 +1,10 @@
 import React from "react";
 import { Autocomplete } from "../Autocomplete";
-import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/ServiceBase";
+import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/types";
 
 export const FieldAutocomplete = <Option extends StandardOption, >(
   {
     getFilteredSuggestions,
-    suggestions,
     MenuItemComponent,
     fieldName,
     formValues,
@@ -14,8 +13,7 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
     placeholder = ""
   }: {
     getFilteredSuggestions: (inputValue: string) => Array<Option>;
-    suggestions?: Array<Option>;
-    MenuItemComponent?: MenuItemComponentType;
+    MenuItemComponent?: MenuItemComponentType<Option>;
     fieldName: string;
     formValues: { [key: string]: any };
     onFieldChange: (changingFieldName: string, value: Option) => void;
@@ -32,7 +30,6 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
   return (
     <Autocomplete<Option>
       getFilteredSuggestions={getFilteredSuggestions}
-      suggestions={suggestions}
       MenuItemComponent={MenuItemComponent}
       onChange={onChange}
       value={formValues[fieldName]}

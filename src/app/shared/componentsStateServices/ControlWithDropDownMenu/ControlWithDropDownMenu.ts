@@ -28,6 +28,7 @@ export type ControlWithDropDownMenuType<Option> = {
     onChangeCallback: (newValue: Option) => void;
   }) => void;
   setMenuStyles: (containerRef: RefObject<HTMLDivElement>) => CSSProperties;
+  closeMenu: () => void;
 }
 
 export type ControlWithDropDownMenuParamsType<
@@ -39,7 +40,7 @@ export type ControlWithDropDownMenuParamsType<
     setComponentState: (newStatePart: Partial<ControlWithDropDownMenuState>) => void,
   };
   serviceCallbacks: {
-    getFilteredSuggestions: (inputValue: string) => Array<Option>;
+    getFilteredSuggestions?: (inputValue: string) => Array<Option>;
     onChange: (newValue: Option) => void;
     getLabel: (newValue: Option) => string;
   };
@@ -60,7 +61,7 @@ implements ControlWithDropDownMenuType<Option>{
 
   private readonly refs;
   
-  private readonly onCloseMenu;
+  public readonly closeMenu;
 
   constructor(
     {
@@ -75,7 +76,7 @@ implements ControlWithDropDownMenuType<Option>{
     this.serviceCallbacks = serviceCallbacks;
     this.refs = refs;
     
-    this.onCloseMenu = () => this.setState(initialState);
+    this.closeMenu = () => this.setState({ ...initialState, userInput: this.getState().userInput });
 
     this.handleMount = this.handleMount.bind(this);
     this.handleUnmount = this.handleUnmount.bind(this);
@@ -87,17 +88,17 @@ implements ControlWithDropDownMenuType<Option>{
   }
 
   public handleMount() {
-    window.addEventListener("scroll", this.onCloseMenu);
-    window.addEventListener("resize", this.onCloseMenu);
+    window.addEventListener("scroll", this.closeMenu);
+    window.addEventListener("resize", this.closeMenu);
   }
 
   public handleUnmount() {
-    window.removeEventListener("scroll", this.onCloseMenu);
-    window.removeEventListener("resize", this.onCloseMenu);
+    window.removeEventListener("scroll", this.closeMenu);
+    window.removeEventListener("resize", this.closeMenu);
   }
 
   public onControlBlur() {
-    this.onCloseMenu();
+    this.closeMenu();
   }
 
   onMenuItemMouseMove(menuItemIndex: number) {
@@ -139,7 +140,7 @@ implements ControlWithDropDownMenuType<Option>{
       return;
     }
 
-    this.onCloseMenu();
+    this.closeMenu();
 
     onChangeCallback(menuItem);
   };
@@ -169,14 +170,14 @@ implements ControlWithDropDownMenuType<Option>{
         return;
       }
 
-      this.onCloseMenu();
+      this.closeMenu();
       onChangeCallback(dropdownMenuItemsData[activeMenuItemIndex]);
 
     }
 
     // User pressed the esc key
     if (eventKey === "Escape") {
-      this.onCloseMenu();
+      this.closeMenu();
     }
 
     // User pressed the up arrow
@@ -184,9 +185,6 @@ implements ControlWithDropDownMenuType<Option>{
       if (activeMenuItemIndex === 0) {
         this.setState({
           activeMenuItemIndex: dropdownMenuItemsData.length - 1,
-          userInput: this.getUserInput(
-            dropdownMenuItemsData[dropdownMenuItemsData.length - 1]
-          ),
           menuItemsHover: false
         });
 
@@ -197,9 +195,6 @@ implements ControlWithDropDownMenuType<Option>{
         activeMenuItemIndex: activeMenuItemIndex === null
           ? dropdownMenuItemsData.length - 1
           : activeMenuItemIndex - 1,
-        userInput: activeMenuItemIndex === null
-          ? this.getUserInput(dropdownMenuItemsData[dropdownMenuItemsData.length - 1])
-          : this.getUserInput(dropdownMenuItemsData[activeMenuItemIndex - 1]),
         menuItemsHover: false
       });
     }
@@ -209,7 +204,6 @@ implements ControlWithDropDownMenuType<Option>{
       if (activeMenuItemIndex === dropdownMenuItemsData.length - 1) {
         this.setState({
           activeMenuItemIndex: 0,
-          userInput: this.getUserInput(dropdownMenuItemsData[0]),
           menuItemsHover: false
         });
 
@@ -220,9 +214,6 @@ implements ControlWithDropDownMenuType<Option>{
         activeMenuItemIndex: activeMenuItemIndex === null
           ? 0
           : activeMenuItemIndex + 1,
-        userInput: activeMenuItemIndex === null
-          ? this.getUserInput(dropdownMenuItemsData[0])
-          : this.getUserInput(dropdownMenuItemsData[activeMenuItemIndex + 1]),
         menuItemsHover: false
       });
     }

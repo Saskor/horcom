@@ -1,19 +1,23 @@
-import React, { CSSProperties, RefObject } from "react";
-import { MenuItemComponentType, StandardOption } from "../types";
+import React, { RefObject } from "react";
+import { StandardOption } from "../types";
 import { ControlWithDropDownMenu } from "../ControlWithDropDownMenu";
+import { SelectStateType } from "../../components/Select/Select";
 
-export type SelectServiceParams<Option> = {
-  dropdownMenuItemsData: Array<Option>;
-  MenuItemComponent?: MenuItemComponentType<Option>;
-  onChange: (newValue: Option) => void;
-  containerRef: RefObject<HTMLDivElement>;
-  getLabel: (item: Option) => string;
-  value: Option;
-}
+export type SelectServiceParamsType<Option> = {
+  componentStateManageHelpers: {
+    getComponentState: () => SelectStateType<Option>;
+    setComponentState: (newStatePart: Partial<SelectStateType<Option>>) => void;
+  };
+  serviceCallbacks: {
+    onChange: (newValue: Option) => void;
+    getLabel: (newValue: Option) => string;
+  };
+  refs: {containerRef: RefObject<HTMLDivElement>};
+  initialState: SelectStateType<Option>;
+};
 
 export type SelectServiceType<Option> = {
   handleMount: () => void;
-  handleUpdate: (params: { [param: string]: any }) => void;
   handleUnmount: () => void;
   onSelectClick: () => void;
   onSelectControlKeyDown: (e: React.KeyboardEvent) => void;
@@ -21,73 +25,65 @@ export type SelectServiceType<Option> = {
   onMenuMouseLeave: () => void;
 }
 
-type SelectServiceState<Option> = {
-  activeMenuItemIndex: number | null;
-  showDropdownMenu: boolean;
-  menuStyles: CSSProperties;
-  menuItemsHover: boolean;
-  dropdownMenuItemsData: Array<Option>,
-  containerRef: RefObject<HTMLDivElement>,
-  value: Option;
-}
-
 export class SelectService<Option extends StandardOption>
-  extends ControlWithDropDownMenu<Option, SelectServiceState<Option>>
-  implements SelectServiceType<Option> {
-  constructor(private readonly params : SelectServiceParams<Option>) {
-    super();
+implements SelectServiceType<Option> {
 
-    this.initState(this.getInitialState(this.params));
-    this.setFunctionsFromParams(this.getFunctionsFromParams(this.params));
+  private readonly setState;
+
+  private readonly getState;
+
+  private readonly serviceCallbacks;
+
+  private readonly refs;
+
+  public controlWithDropDownMenu;
+
+  constructor(
+    {
+      componentStateManageHelpers,
+      serviceCallbacks,
+      refs,
+      initialState
+    }: SelectServiceParamsType<Option>
+  ) {
+    this.setState = componentStateManageHelpers.setComponentState;
+    this.getState = componentStateManageHelpers.getComponentState;
+    this.serviceCallbacks = serviceCallbacks;
+    this.refs = refs;
+
+
+    this.controlWithDropDownMenu = new ControlWithDropDownMenu<Option, SelectStateType<Option>>(
+      {
+        componentStateManageHelpers,
+        serviceCallbacks,
+        refs,
+        initialState
+      }
+    );
   }
-
-  private getFunctionsFromParams = ({
-    MenuItemComponent,
-    onChange,
-    getLabel
-  }: SelectServiceParams<Option>) => ({
-    MenuItemComponent,
-    onChange,
-    getLabel
-  })
-
-  private getInitialState = (params: SelectServiceParams<Option>): SelectServiceState<Option> => ({
-    activeMenuItemIndex: null,
-    showDropdownMenu: false,
-    menuStyles: this.setMenuStyles(params.containerRef),
-    menuItemsHover: true,
-    dropdownMenuItemsData: params.dropdownMenuItemsData = [],
-    containerRef: params.containerRef,
-    value: params.value
-  })
 
   handleMount = () => {
-    super.handleMount();
+    this.controlWithDropDownMenu.handleMount();
 
-    this.setMenuStyles(this.params.containerRef);
-  }
-
-  handleUpdate(params: { [p: string]: any }) {
-    super.handleUpdate(params);
+    this.controlWithDropDownMenu.setMenuStyles(this.refs.containerRef);
   }
 
   handleUnmount = () => {
-    super.handleUnmount();
-    this.clearService();
+    this.controlWithDropDownMenu.handleUnmount();
   }
 
   onSelectClick = () => {
-    const { showDropdownMenu: showDropdownMenuPrev } = this.state;
+    const { showDropdownMenu: showDropdownMenuPrev } = this.getState();
 
     if (!showDropdownMenuPrev) {
       this.setState({
-        menuStyles: this.setMenuStyles(this.state.containerRef),
+        menuStyles: this.controlWithDropDownMenu.setMenuStyles(this.refs.containerRef),
         showDropdownMenu: true
       });
     }
 
     if (showDropdownMenuPrev) {
-      this.closeMenu();
+      this.controlWithDropDownMenu.closeMenu();
     }
   };
 
@@ -95,11 +91,11 @@ export class SelectService<Option extends StandardOption>
     const {
       activeMenuItemIndex,
       dropdownMenuItemsData = []
-    } = this.state;
+    } = this.getState();
 
-    const { onChange: onChangeCallback } = this.functionsFromParams;
+    const { onChange: onChangeCallback } = this.serviceCallbacks;
 
-    this.onControlKeyDown({
+    this.controlWithDropDownMenu.onControlKeyDown({
       eventKey: e.key,
       dropdownMenuItemsData,
       activeMenuItemIndex,
@@ -108,7 +104,7 @@ export class SelectService<Option extends StandardOption>
   };
 
   onMenuItemClick = (menuItem: Option) => {
-    super.onMenuItemClick(menuItem, this.functionsFromParams.onChange);
+    this.controlWithDropDownMenu.onMenuItemClick(menuItem, this.serviceCallbacks.onChange);
   }
 
   onMenuMouseLeave = () => {

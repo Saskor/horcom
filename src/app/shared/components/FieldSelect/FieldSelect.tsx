@@ -1,6 +1,6 @@
 import React from "react";
 import { Select } from "../Select";
-import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/ServiceBase";
+import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/types";
 
 export const FieldSelect = <Option extends StandardOption, >(
   {
@@ -15,7 +15,7 @@ export const FieldSelect = <Option extends StandardOption, >(
     fieldName: string;
     formValues: { [key: string]: any };
     onFieldChange: (changingFieldName: string, value: Option) => void;
-    MenuItemComponent?: MenuItemComponentType;
+    MenuItemComponent?: MenuItemComponentType<Option>;
     getLabel?: (newValue: Option) => string;
   }
 ) => {

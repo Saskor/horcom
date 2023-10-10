@@ -2,12 +2,12 @@ import React, { RefObject } from "react";
 import { debounce } from "../../helpers/customDebounce";
 import { StandardOption } from "../types";
 import { ControlWithDropDownMenu } from "../ControlWithDropDownMenu";
-import { AutocompleteState } from "../../components/Autocomplete/Autocomplete";
+import { AutocompleteStateType } from "../../components/Autocomplete/Autocomplete";
 
-export type AutocompleteServiceParams<Option> = {
+export type AutocompleteServiceParamsType<Option> = {
   componentStateManageHelpers: {
-    getComponentState: () => AutocompleteState<Option>,
-    setComponentState: (newStatePart: Partial<AutocompleteState<Option>>) => void,
+    getComponentState: () => AutocompleteStateType<Option>,
+    setComponentState: (newStatePart: Partial<AutocompleteStateType<Option>>) => void,
   };
   serviceCallbacks: {
     getFilteredSuggestions: (inputValue: string) => Array<Option>;
@@ -15,7 +15,7 @@ export type AutocompleteServiceParams<Option> = {
     getLabel: (newValue: Option) => string;
   };
   refs: {containerRef: RefObject<HTMLDivElement>};
-  initialState: AutocompleteState<Option>;
+  initialState: AutocompleteStateType<Option>;
 };
 
 export type AutocompleteServiceType<Option> = {
@@ -58,7 +58,7 @@ implements AutocompleteServiceType<Option> {
       serviceCallbacks,
       refs,
       initialState
-    }: AutocompleteServiceParams<Option>
+    }: AutocompleteServiceParamsType<Option>
   ) {
     this.setState = componentStateManageHelpers.setComponentState;
     this.getState = componentStateManageHelpers.getComponentState;
@@ -66,7 +66,7 @@ implements AutocompleteServiceType<Option> {
     this.refs = refs;
 
 
-    this.controlWithDropDownMenu = new ControlWithDropDownMenu<Option, AutocompleteState<Option>>(
+    this.controlWithDropDownMenu = new ControlWithDropDownMenu<Option, AutocompleteStateType<Option>>(
       {
         componentStateManageHelpers,
         serviceCallbacks,

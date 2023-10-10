@@ -5,7 +5,8 @@ import { DropdownMenu } from "../DropdownMenu";
 import { useComponentService } from "../../hooks/useComponentService";
 import {
   AutocompleteService,
-  AutocompleteServiceParams, AutocompleteServiceType
+  AutocompleteServiceParamsType,
+  AutocompleteServiceType
 } from "../../componentsStateServices/AutocompleteService";
 import {
   MenuItemComponentType,
@@ -13,7 +14,7 @@ import {
 } from "../../componentsStateServices/types";
 import styles from "./Autocomplete.scss";
 
-export type AutocompleteState<Option> = {
+export type AutocompleteStateType<Option> = {
     activeMenuItemIndex: null | number;
     showDropdownMenu: boolean;
     menuStyles: CSSProperties;
@@ -21,16 +22,6 @@ export type AutocompleteState<Option> = {
     filteredSuggestions: Array<Option>;
     userInput: string;
 }
-
-/*
- *activeMenuItemIndex: null,
- *  +showDropdownMenu: false,
- *  +menuStyles: this.setMenuStyles(params.containerRef),
- *  +menuItemsHover: true,
- *  dropdownMenuItemsData: params.dropdownMenuItemsData = [],
- *  +containerRef: params.containerRef,
- *  +value: params.value
- */
 
 export const Autocomplete = <Option extends StandardOption, >(
   {
@@ -53,7 +44,7 @@ export const Autocomplete = <Option extends StandardOption, >(
 ) => {
   const containerRef: RefObject<HTMLDivElement> = useRef(null);
 
-  const initialState = {
+  const initialState: AutocompleteStateType<Option> = {
     activeMenuItemIndex: null,
     showDropdownMenu: false,
     menuStyles: {
@@ -67,9 +58,9 @@ export const Autocomplete = <Option extends StandardOption, >(
     userInput: ""
   };
 
-  const [ state, setComponentState ] = useState<AutocompleteState<Option>>(initialState);
+  const [ state, setComponentState ] = useState<AutocompleteStateType<Option>>(initialState);
 
-  const setState = (newStatePart: Partial<AutocompleteState<Option>>) => {
+  const setState = (newStatePart: Partial<AutocompleteStateType<Option>>) => {
     setComponentState({
       ...state,
       ...newStatePart
@@ -80,7 +71,7 @@ export const Autocomplete = <Option extends StandardOption, >(
 
   const Service = useComponentService<
     AutocompleteService<Option>,
-    AutocompleteServiceParams<Option>
+    AutocompleteServiceParamsType<Option>
     >(
       {
         Service: AutocompleteService,
@@ -100,6 +91,8 @@ export const Autocomplete = <Option extends StandardOption, >(
       }
     ) as AutocompleteServiceType<Option>;
 
+  const displayedValue = getLabel(value);
+
   return (
     <Fragment>
       <div
@@ -111,7 +104,7 @@ export const Autocomplete = <Option extends StandardOption, >(
           onChange={Service.onInputChange}
           onKeyDown={Service.onAutocompleteControlKeyDown}
           // onBlur={onControlBlur}
-          value={state.userInput}
+          value={state.userInput !== displayedValue ? state.userInput : displayedValue}
           placeholder={placeholder}
         />
       </div>

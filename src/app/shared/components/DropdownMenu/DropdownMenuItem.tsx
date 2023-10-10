@@ -43,7 +43,7 @@ export const DropdownMenuItem = <Option extends StandardOption, >(
       return <MenuItemComponent menuItemData={menuItemData} />;
     }
 
-    return getLabel(menuItemData);
+    return typeof getLabel === "function" ? getLabel(menuItemData) : menuItemData.label;
   };
 
   return (

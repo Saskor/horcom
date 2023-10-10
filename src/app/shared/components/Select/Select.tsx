@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef, useEffect } from "react";
+import React, { Fragment, useState, useRef, CSSProperties, RefObject } from "react";
 import cn from "classnames";
 import { FaChevronDown } from "react-icons/fa";
 import { Portal } from "../Portal";
@@ -6,13 +6,22 @@ import { DropdownMenu } from "../DropdownMenu";
 import {
   MenuItemComponentType,
   StandardOption
-} from "../../componentsStateServices/ServiceBase";
+} from "../../componentsStateServices/types";
 import { useComponentService } from "../../hooks/useComponentService";
 import {
   SelectService,
   SelectServiceParams
 } from "../../componentsStateServices/SelectService";
 import styles from "./Select.scss";
+
+export type SelectStateType<Option> = {
+  activeMenuItemIndex: null | number;
+  showDropdownMenu: boolean;
+  menuStyles: CSSProperties;
+  menuItemsHover: boolean;
+  dropdownMenuItemsData: Array<Option>;
+  userInput: string;
+}
 
 export const Select = <Option extends StandardOption, >(
   {
@@ -24,15 +33,39 @@ export const Select = <Option extends StandardOption, >(
     getLabel = (dataItem: Option) => dataItem.label || ""
   }: {
     dropdownMenuItemsData: Array<Option>;
-    MenuItemComponent?: MenuItemComponentType;
+    MenuItemComponent?: MenuItemComponentType<Option>;
     dropdownMenuPortalTargetId?: string;
     onChange: (newValue: Option) => void;
     value: Option;
     getLabel?: (newValue: Option) => string;
   }
 ) => {
-  const containerRef = useRef(null);
-  const [ , setState ] = useState(null);
+  const containerRef: RefObject<HTMLDivElement> = useRef(null);
+
+  const initialState: SelectStateType<Option> = {
+    activeMenuItemIndex: null,
+    showDropdownMenu: false,
+    menuStyles: {
+      position: undefined,
+      top: "0px",
+      left: "0px",
+      width: "0px"
+    },
+    menuItemsHover: true,
+    dropdownMenuItemsData,
+    userInput: ""
+  };
+
+  const [ state, setComponentState ] = useState<SelectStateType<Option>>(initialState);
+
+  const setState = (newStatePart: Partial<SelectStateType<Option>>) => {
+    setComponentState({
+      ...state,
+      ...newStatePart
+    });
+  };
+
+  const getState = () => state;
 
   const Service = useComponentService<
     SelectService<Option>,
@@ -40,33 +73,25 @@ export const Select = <Option extends StandardOption, >(
     >(
       {
         Service: SelectService,
-        serviceChangeHandler: setState,
         serviceParams: {
-          dropdownMenuItemsData,
-          MenuItemComponent,
-          onChange,
-          containerRef,
-          value,
-          getLabel
+          componentStateManageHelpers: {
+            getComponentState: getState,
+            setComponentState: setState
+          },
+          serviceCallbacks: {
+            onChange,
+            getLabel
+          },
+          refs: { containerRef },
+          initialState
         }
       }
     ) as SelectService<Option>;
 
-  useEffect(() => {
-    Service.handleUpdate({
-      dropdownMenuItemsData
-    });
-  }, [ dropdownMenuItemsData ]);
-
-  useEffect(() => {
-    Service.handleUpdate({
-      value
-    });
-  }, [ value ]);
+  const displayedValue = getLabel(value);
 
   return (
     <Fragment>
-      {/* console.log(state, Service.state)*/}
       <div
         className={cn(styles.container)}
         ref={containerRef}
@@ -78,24 +103,25 @@ export const Select = <Option extends StandardOption, >(
           // onBlur={onControlBlur}
           onClick={Service.onSelectClick}
         >
-          {getLabel(Service.state.value)}
+          {state.userInput !== displayedValue ? state.userInput : displayedValue}
           <FaChevronDown />
         </button>
       </div>
-      {Service.state.showDropdownMenu && (
+      {state.showDropdownMenu && (
         <Portal
           portalRootElementId={dropdownMenuPortalTargetId}
         >
           <DropdownMenu<Option>
-            menuItemsData={Service.state.dropdownMenuItemsData}
-            menuItemsHover={Service.state.menuItemsHover}
-            activeSuggestionIndex={Service.state.activeMenuItemIndex}
+            menuItemsData={dropdownMenuItemsData}
+            menuItemsHover={state.menuItemsHover}
+            activeSuggestionIndex={state.activeMenuItemIndex}
             onMenuItemClick={Service.onMenuItemClick}
-            onMenuItemMouseEnter={Service.onMenuItemMouseEnter}
-            onMenuItemMouseMove={Service.onMenuItemMouseMove}
+            onMenuItemMouseEnter={Service.controlWithDropDownMenu.onMenuItemMouseEnter}
+            onMenuItemMouseMove={Service.controlWithDropDownMenu.onMenuItemMouseMove}
             onMenuMouseLeave={Service.onMenuMouseLeave}
-            menuStyles={Service.state.menuStyles}
+            menuStyles={state.menuStyles}
             getLabel={getLabel}
+            MenuItemComponent={MenuItemComponent}
           />
         </Portal>
       )}
