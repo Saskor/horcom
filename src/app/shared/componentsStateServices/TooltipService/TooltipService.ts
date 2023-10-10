@@ -1,74 +1,48 @@
-import { CSSProperties, RefObject } from "react";
+import { CSSProperties, MutableRefObject, ReactElement } from "react";
 import {
   E_TOOLTIP_PLACEMENT,
   TOOLTIP_HORIZONTAL_PADDING,
   TOOLTIP_INDENT,
   TOOLTIP_VERTICAL_PADDING
 } from "../../constants/tooltip";
+import { TooltipStateType } from "../../components/Tooltip/Tooltip";
 
 
-export type TooltipServiceParams = {
-  tooltipTargetRef: RefObject<HTMLElement>;
-  text: string;
-  tooltipPlacement: E_TOOLTIP_PLACEMENT;
+export type TooltipServiceParamsType = {
+  componentStateManageHelpers: {
+    getComponentState: () => TooltipStateType;
+    setComponentState: (newStatePart: Partial<TooltipStateType>) => void;
+  };
+  refs: { tooltipTargetRef: MutableRefObject<null | ReactElement> };
 };
 
 export type TooltipServiceType = {
   handleMount: () => void;
-  handleUpdate: (params: { [param: string]: any }) => void;
   handleUnmount: () => void;
-}
-
-type TooltipServiceState = TooltipServiceParams & {
-  tooltipStyles: CSSProperties,
-  showTooltip: boolean
+  onTooltipTargetMouseEnter: () => void;
+  onTooltipTargetMouseLeave: () => void;
 }
 
 export class TooltipService implements TooltipServiceType {
-  constructor(private readonly params: TooltipServiceParams) {
-    super();
 
-    this.initState(this.getInitialState(this.params));
-    // this.setFunctionsFromParams(this.getFunctionsFromParams(this.params));
+  private canvas: HTMLCanvasElement;
+
+  private readonly setState;
+
+  private readonly getState;
+
+  private readonly refs;
+
+  constructor(
+    {
+      componentStateManageHelpers,
+      refs
+    }: TooltipServiceParamsType
+  ) {
+    this.setState = componentStateManageHelpers.setComponentState;
+    this.getState = componentStateManageHelpers.getComponentState;
+    this.refs = refs;
     this.canvas = document.createElement("canvas");
-  }
-
-  // private getFunctionsFromParams = ({}: TooltipServiceParams) => ({})
-
-  canvas: HTMLCanvasElement
-
-  private getInitialState = ({
-    tooltipTargetRef,
-    text,
-    tooltipPlacement
-  }: TooltipServiceParams): TooltipServiceState => ({
-    tooltipTargetRef,
-    text,
-    tooltipPlacement,
-    showTooltip: false,
-    tooltipStyles: {
-      position: "absolute",
-      top: "0px",
-      left: "0px",
-      width: "0px"
-    }
-  })
-
-  handleMount = () => {
-    window.addEventListener("scroll", this.handleScroll);
-    this.state.tooltipTargetRef.current.addEventListener("mouseenter", this.onTooltipTargetMouseEnter);
-    this.state.tooltipTargetRef.current.addEventListener("mouseleave", this.onTooltipTargetMouseLeave);
-  }
-
-  handleUpdate(params: { [p: string]: any }) {
-    super.handleUpdate(params);
-  }
-
-  handleUnmount = () => {
-    window.removeEventListener("scroll", this.handleScroll);
-    this.state.tooltipTargetRef.current.removeEventListener("mouseenter", this.onTooltipTargetMouseEnter);
-    this.state.tooltipTargetRef.current.removeEventListener("mouseleave", this.onTooltipTargetMouseLeave);
-    this.clearService();
   }
 
   private handleScroll = () => {
@@ -79,7 +53,15 @@ export class TooltipService implements TooltipServiceType {
     this.setState({ showTooltip: false });
   }
 
-  private onTooltipTargetMouseEnter = () => {
+  handleMount = () => {
+    window.addEventListener("scroll", this.handleScroll);
+  }
+
+  handleUnmount = () => {
+    window.removeEventListener("scroll", this.handleScroll);
+  }
+
+  public onTooltipTargetMouseEnter = () => {
     this.setState(
       {
         tooltipStyles: this.setTooltipStyles(),
@@ -88,7 +70,7 @@ export class TooltipService implements TooltipServiceType {
     );
   }
 
-  private onTooltipTargetMouseLeave = () => {
+  public onTooltipTargetMouseLeave = () => {
     this.setState({ showTooltip: false });
   }
 
@@ -122,14 +104,14 @@ export class TooltipService implements TooltipServiceType {
     width: number;
     height: number;
   } => {
-    const { tooltipTargetRef } = this.state;
+    const { tooltipTargetRef } = this.refs;
     const tooltipTextWidth = this.getTextWidth(
       text,
-      this.getCanvasFont(tooltipTargetRef.current as HTMLElement)
+      this.getCanvasFont(tooltipTargetRef.current)
     );
     const tooltipWidth: number = tooltipTextWidth + (TOOLTIP_HORIZONTAL_PADDING * 2);
     const tooltipFontSize = Number.parseInt(
-      this.getCssStyle(tooltipTargetRef.current as HTMLElement, "font-size")
+      this.getCssStyle(tooltipTargetRef.current, "font-size")
     );
     const tooltipHeight: number = tooltipFontSize + (TOOLTIP_VERTICAL_PADDING * 2);
 
@@ -149,15 +131,6 @@ export class TooltipService implements TooltipServiceType {
       width: tooltipWidth,
       height: tooltipHeight
     } = this.getTooltipSize(text);
-    const {
-      top: targetTop,
-      bottom: targetBottom,
-      left: targetLeft,
-      right: targetRight,
-      width: targetWidth,
-      height: targetHeight
-    } = this.state.tooltipTargetRef.current.getBoundingClientRect();
-
     const tooltipBoundariesPosition: {
       top: number;
       right: number;
@@ -170,6 +143,15 @@ export class TooltipService implements TooltipServiceType {
       right: 0
     };
 
+    const {
+      top: targetTop,
+      bottom: targetBottom,
+      left: targetLeft,
+      right: targetRight,
+      width: targetWidth,
+      height: targetHeight
+    } = this.refs.tooltipTargetRef.current?.getBoundingClientRect();
+
     const horizontalPlacementTypeTooltipTop
       = targetTop + (targetHeight / 2) - (tooltipHeight / 2);
     const horizontalPlacementTypeTooltipBottom
@@ -179,7 +161,7 @@ export class TooltipService implements TooltipServiceType {
     const verticalPlacementTypeTooltipRight
       = verticalPlacementTypeTooltipLeft + tooltipWidth;
 
-    switch (this.state.tooltipPlacement) {
+    switch (this.getState().tooltipPlacement) {
       case E_TOOLTIP_PLACEMENT.TOP: {
         const tooltipTop = targetTop - TOOLTIP_INDENT - tooltipHeight + document.documentElement.scrollTop;
         const tooltipTopOutOfTheScreenTop = tooltipTop < document.documentElement.scrollTop;
@@ -237,14 +219,14 @@ export class TooltipService implements TooltipServiceType {
   }
 
   private setTooltipStyles(): CSSProperties {
-    const tooltipBoundariesPosition = this.getTooltipBoundariesPosition(this.state.text);
+    const tooltipBoundariesPosition = this.getTooltipBoundariesPosition(this.getState().text);
 
     return ({
       position: "absolute",
       top: `${tooltipBoundariesPosition.top}px`,
       left: `${tooltipBoundariesPosition.left}px`,
       width: `${tooltipBoundariesPosition.right - tooltipBoundariesPosition.left}px`,
-      fontSize: this.getCanvasFontSize(this.state.tooltipTargetRef.current as HTMLElement)
+      fontSize: this.getCanvasFontSize(this.refs.tooltipTargetRef.current)
     });
   }
 }

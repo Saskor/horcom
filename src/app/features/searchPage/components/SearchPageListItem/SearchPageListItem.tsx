@@ -44,10 +44,11 @@ export const SearchPageListItem = ({
           Хештег для размещения отзыва в VK: <span>{dataItem.reviewsHashtag}</span>
           <Tooltip
             text="Копировать хештег"
-            tooltipTargetRef={hashtagRef}
             tooltipPlacement={E_TOOLTIP_PLACEMENT.BOTTOM}
-          />
-          <div className={cn(styles.flipHorizontal)} ref={hashtagRef}><FiCopy /></div>
+          >
+            <div className={cn(styles.flipHorizontal)}><FiCopy /></div>
+          </Tooltip>
+
         </div>
         <div className={cn(styles.infoRow)}>
           {"Отзывы в VK: "}

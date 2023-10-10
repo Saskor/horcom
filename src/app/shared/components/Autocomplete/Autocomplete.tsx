@@ -61,10 +61,10 @@ export const Autocomplete = <Option extends StandardOption, >(
   const [ state, setComponentState ] = useState<AutocompleteStateType<Option>>(initialState);
 
   const setState = (newStatePart: Partial<AutocompleteStateType<Option>>) => {
-    setComponentState({
-      ...state,
+    setComponentState(currentState => ({
+      ...currentState,
       ...newStatePart
-    });
+    }));
   };
 
   const getState = () => state;
@@ -104,7 +104,7 @@ export const Autocomplete = <Option extends StandardOption, >(
           onChange={Service.onInputChange}
           onKeyDown={Service.onAutocompleteControlKeyDown}
           // onBlur={onControlBlur}
-          value={state.userInput !== displayedValue ? state.userInput : displayedValue}
+          value={displayedValue && !state.userInput ? displayedValue : state.userInput}
           placeholder={placeholder}
         />
       </div>

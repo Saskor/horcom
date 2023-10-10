@@ -1,2 +1,2 @@
-export type { TooltipServiceType, TooltipServiceParams } from "./TooltipService";
+export type { TooltipServiceType, TooltipServiceParamsType } from "./TooltipService";
 export { TooltipService } from "./TooltipService";

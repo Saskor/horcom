@@ -25,18 +25,6 @@ export type AutocompleteServiceType<Option> = {
   onAutocompleteControlKeyDown: (e: React.KeyboardEvent) => void;
   onMenuItemClick: (menuItem: Option) => void;
   onMenuMouseLeave: () => void;
-
-  /*
-   *getState: () => AutocompleteState<Option>,
-   *setState: (newStatePart: Partial<AutocompleteState<Option>>) => void,
-   *serviceCallbacks: {
-   *getFilteredSuggestions: (inputValue: string) => Array<Option>;
-   *onChange: (newValue: Option) => void;
-   *getLabel?: (newValue: Option) => string;
-   *};
-   *refs: {containerRef: RefObject<HTMLDivElement>};
-   */
-
   controlWithDropDownMenu: any;
 }
 
@@ -87,7 +75,6 @@ implements AutocompleteServiceType<Option> {
   private inputChangeCallback = (userInput: string) => {
     const { getFilteredSuggestions } = this.serviceCallbacks;
 
-    // Filter our suggestions that don't contain the user's input
     const filteredSuggestions = getFilteredSuggestions(userInput);
 
     this.setState({

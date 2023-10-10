@@ -149,7 +149,7 @@ implements ControlWithDropDownMenuType<Option>{
     }
 
     this.closeMenu();
-
+    this.setState({ userInput: "" });
     onChangeCallback(menuItem);
   };
 

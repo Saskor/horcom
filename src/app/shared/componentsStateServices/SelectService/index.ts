@@ -1,2 +1,2 @@
-export type { SelectServiceType } from "./SelectService";
+export type { SelectServiceType, SelectServiceParamsType } from "./SelectService";
 export { SelectService } from "./SelectService";

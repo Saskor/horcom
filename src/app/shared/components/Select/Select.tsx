@@ -9,7 +9,8 @@ import {
 } from "../../componentsStateServices/types";
 import { useComponentService } from "../../hooks/useComponentService";
 import {
-  SelectService
+  SelectService,
+  SelectServiceParamsType
 } from "../../componentsStateServices/SelectService";
 import styles from "./Select.scss";
 
@@ -56,17 +57,17 @@ export const Select = <Option extends StandardOption, >(
   const [ state, setComponentState ] = useState<SelectStateType<Option>>(initialState);
 
   const setState = (newStatePart: Partial<SelectStateType<Option>>) => {
-    setComponentState({
-      ...state,
+    setComponentState(currentState => ({
+      ...currentState,
       ...newStatePart
-    });
+    }));
   };
 
   const getState = () => state;
 
   const Service = useComponentService<
     SelectService<Option>,
-    SelectServiceParams<Option>
+    SelectServiceParamsType<Option>
     >(
       {
         Service: SelectService,
