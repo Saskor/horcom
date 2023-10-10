@@ -5,7 +5,7 @@ type ControlWithDropDownMenuState = {
   activeMenuItemIndex: null | number;
   menuStyles: CSSProperties;
   menuItemsHover: boolean;
-  userInput: string;
+  userInput?: string;
 };
 
 
@@ -76,7 +76,15 @@ implements ControlWithDropDownMenuType<Option>{
     this.serviceCallbacks = serviceCallbacks;
     this.refs = refs;
     
-    this.closeMenu = () => this.setState({ ...initialState, userInput: this.getState().userInput });
+    this.closeMenu = () => this.setState({
+      ...initialState,
+      ...(this.getState().userInput !== undefined
+        ? {
+          userInput: this.getState().userInput
+        }
+        : {}
+      )
+    });
 
     this.handleMount = this.handleMount.bind(this);
     this.handleUnmount = this.handleUnmount.bind(this);

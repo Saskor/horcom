@@ -9,8 +9,7 @@ import {
 } from "../../componentsStateServices/types";
 import { useComponentService } from "../../hooks/useComponentService";
 import {
-  SelectService,
-  SelectServiceParams
+  SelectService
 } from "../../componentsStateServices/SelectService";
 import styles from "./Select.scss";
 
@@ -20,7 +19,6 @@ export type SelectStateType<Option> = {
   menuStyles: CSSProperties;
   menuItemsHover: boolean;
   dropdownMenuItemsData: Array<Option>;
-  userInput: string;
 }
 
 export const Select = <Option extends StandardOption, >(
@@ -52,8 +50,7 @@ export const Select = <Option extends StandardOption, >(
       width: "0px"
     },
     menuItemsHover: true,
-    dropdownMenuItemsData,
-    userInput: ""
+    dropdownMenuItemsData
   };
 
   const [ state, setComponentState ] = useState<SelectStateType<Option>>(initialState);
@@ -88,8 +85,6 @@ export const Select = <Option extends StandardOption, >(
       }
     ) as SelectService<Option>;
 
-  const displayedValue = getLabel(value);
-
   return (
     <Fragment>
       <div
@@ -103,7 +98,7 @@ export const Select = <Option extends StandardOption, >(
           // onBlur={onControlBlur}
           onClick={Service.onSelectClick}
         >
-          {state.userInput !== displayedValue ? state.userInput : displayedValue}
+          {getLabel(value)}
           <FaChevronDown />
         </button>
       </div>
