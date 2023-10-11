@@ -1,4 +1,4 @@
-import React, { CSSProperties, Fragment, RefObject, useRef, useState } from "react";
+import React, { Fragment, RefObject, useRef, useState } from "react";
 import cn from "classnames";
 import { Portal } from "../Portal";
 import { DropdownMenu } from "../DropdownMenu";
@@ -14,22 +14,12 @@ import {
 } from "../../componentsStateServices/types";
 import styles from "./Autocomplete.scss";
 
-export type AutocompleteStateType<Option> = {
-    activeMenuItemIndex: null | number;
-    showDropdownMenu: boolean;
-    menuStyles: CSSProperties;
-    menuItemsHover: boolean;
-    filteredSuggestions: Array<Option>;
-    userInput: string;
-}
-
 export const Autocomplete = <Option extends StandardOption, >(
   {
     getFilteredSuggestions,
     MenuItemComponent,
     dropdownMenuPortalTargetId,
     onChange,
-    value,
     getLabel = (dataItem: Option) => dataItem.label || "",
     placeholder = ""
   }: {
@@ -37,37 +27,22 @@ export const Autocomplete = <Option extends StandardOption, >(
     MenuItemComponent?: MenuItemComponentType<Option>;
     dropdownMenuPortalTargetId?: string;
     onChange: (newValue: Option) => void;
-    value: Option;
     getLabel?: (newValue: Option) => string;
     placeholder?: string,
   }
 ) => {
   const containerRef: RefObject<HTMLDivElement> = useRef(null);
 
-  const initialState: AutocompleteStateType<Option> = {
-    activeMenuItemIndex: null,
-    showDropdownMenu: false,
-    menuStyles: {
-      position: undefined,
-      top: "0px",
-      left: "0px",
-      width: "0px"
-    },
-    menuItemsHover: true,
-    filteredSuggestions: [],
-    userInput: ""
-  };
+  const [
+    ,
+    setComponentState
+  ] = useState<{ stateChangedCounter: number }>({ stateChangedCounter: 0 });
 
-  const [ state, setComponentState ] = useState<AutocompleteStateType<Option>>(initialState);
-
-  const setState = (newStatePart: Partial<AutocompleteStateType<Option>>) => {
+  const incrementComponentStateChangedCounter = () => {
     setComponentState(currentState => ({
-      ...currentState,
-      ...newStatePart
+      stateChangedCounter: currentState.stateChangedCounter + 1
     }));
   };
-
-  const getState = () => state;
 
   const Service = useComponentService<
     AutocompleteService<Option>,
@@ -76,24 +51,19 @@ export const Autocomplete = <Option extends StandardOption, >(
       {
         Service: AutocompleteService,
         serviceParams: {
-          componentStateManageHelpers: {
-            getComponentState: getState,
-            setComponentState: setState
-          },
+          incrementComponentStateChangedCounter,
           serviceCallbacks: {
             getFilteredSuggestions,
             onChange,
             getLabel
           },
-          refs: { containerRef },
-          initialState
+          refs: { containerRef }
         }
       }
     ) as AutocompleteServiceType<Option>;
 
-  const displayedValue = getLabel(value);
-
   return (
+
     <Fragment>
       <div
         className={cn(styles.container)}
@@ -103,24 +73,23 @@ export const Autocomplete = <Option extends StandardOption, >(
           type="text"
           onChange={Service.onInputChange}
           onKeyDown={Service.onAutocompleteControlKeyDown}
-          // onBlur={onControlBlur}
-          value={displayedValue && !state.userInput ? displayedValue : state.userInput}
+          value={Service.getState().userInput}
           placeholder={placeholder}
         />
       </div>
-      {state.showDropdownMenu && (
+      {Service.getState().showDropdownMenu && (
         <Portal
           portalRootElementId={dropdownMenuPortalTargetId}
         >
           <DropdownMenu
-            menuItemsData={state.filteredSuggestions}
-            menuItemsHover={state.menuItemsHover}
-            activeSuggestionIndex={state.activeMenuItemIndex}
+            menuItemsData={Service.getState().filteredSuggestions}
+            menuItemsHover={Service.getState().menuItemsHover}
+            activeSuggestionIndex={Service.getState().activeMenuItemIndex}
             onMenuItemClick={Service.onMenuItemClick}
             onMenuItemMouseEnter={Service.controlWithDropDownMenu.onMenuItemMouseEnter}
             onMenuItemMouseMove={Service.controlWithDropDownMenu.onMenuItemMouseMove}
             onMenuMouseLeave={Service.onMenuMouseLeave}
-            menuStyles={state.menuStyles}
+            menuStyles={Service.getState().menuStyles}
             getLabel={getLabel}
             MenuItemComponent={MenuItemComponent}
           />

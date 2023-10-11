@@ -54,11 +54,11 @@ export class TooltipService implements TooltipServiceType {
   }
 
   handleMount = () => {
-    window.addEventListener("scroll", this.handleScroll);
+    document.addEventListener("scroll", this.handleScroll);
   }
 
   handleUnmount = () => {
-    window.removeEventListener("scroll", this.handleScroll);
+    document.removeEventListener("scroll", this.handleScroll);
   }
 
   public onTooltipTargetMouseEnter = () => {

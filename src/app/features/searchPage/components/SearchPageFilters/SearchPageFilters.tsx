@@ -17,7 +17,6 @@ export const SearchPageFilters = observer((
     init,
     createSubcategoryOptions,
     getSearchablePlaceOptions,
-    filterFormValues,
     onChangeFilterFormValue,
     getSearchablePlaceOptionLabel
   } = searchPageStore;
@@ -29,14 +28,12 @@ export const SearchPageFilters = observer((
       <FieldAutocomplete<FilterFormField>
         getFilteredSuggestions={createSubcategoryOptions}
         fieldName="subcategory"
-        formValues={filterFormValues}
         onFieldChange={onChangeFilterFormValue}
         placeholder="Что искать"
       />
       <FieldAutocomplete<SearchablePlace>
         getFilteredSuggestions={getSearchablePlaceOptions}
         fieldName="searchablePlace"
-        formValues={filterFormValues}
         onFieldChange={onChangeFilterFormValue}
         getLabel={getSearchablePlaceOptionLabel}
         placeholder="Где искать"

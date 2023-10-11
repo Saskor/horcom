@@ -7,7 +7,6 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
     getFilteredSuggestions,
     MenuItemComponent,
     fieldName,
-    formValues,
     onFieldChange,
     getLabel,
     placeholder = ""
@@ -15,7 +14,6 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
     getFilteredSuggestions: (inputValue: string) => Array<Option>;
     MenuItemComponent?: MenuItemComponentType<Option>;
     fieldName: string;
-    formValues: { [key: string]: any };
     onFieldChange: (changingFieldName: string, value: Option) => void;
     getLabel?: (newValue: Option) => string;
     placeholder?: string;
@@ -32,7 +30,6 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
       getFilteredSuggestions={getFilteredSuggestions}
       MenuItemComponent={MenuItemComponent}
       onChange={onChange}
-      value={formValues[fieldName]}
       getLabel={getLabel}
       placeholder={placeholder}
     />

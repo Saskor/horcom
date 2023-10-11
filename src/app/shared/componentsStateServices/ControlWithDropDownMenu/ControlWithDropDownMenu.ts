@@ -12,7 +12,6 @@ type ControlWithDropDownMenuState = {
 export type ControlWithDropDownMenuType<Option> = {
   handleMount: () => void;
   handleUnmount: () => void;
-  onControlBlur: () => void;
   onMenuItemClick: (suggestion: Option, onChangeCallback: (value: Option) => void) => void;
   onMenuItemMouseMove: (menuItemIndex: number) => void;
   onMenuItemMouseEnter: (menuItemIndex: number) => void;
@@ -63,6 +62,8 @@ implements ControlWithDropDownMenuType<Option>{
   
   public readonly closeMenu;
 
+  private readonly clearState;
+
   constructor(
     {
       componentStateManageHelpers,
@@ -76,44 +77,46 @@ implements ControlWithDropDownMenuType<Option>{
     this.serviceCallbacks = serviceCallbacks;
     this.refs = refs;
     
-    this.closeMenu = () => this.setState({
-      ...initialState,
-      ...(this.getState().userInput !== undefined
-        ? {
-          userInput: this.getState().userInput
-        }
-        : {}
-      )
-    });
+    this.closeMenu = () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { userInput, ...rest } = initialState;
+      this.setState({ ...rest });
+    };
+
+    this.clearState = () => this.setState({ ...initialState });
 
     this.handleMount = this.handleMount.bind(this);
     this.handleUnmount = this.handleUnmount.bind(this);
-    this.onControlBlur = this.onControlBlur.bind(this);
     this.onMenuItemClick = this.onMenuItemClick.bind(this);
     this.onMenuItemMouseMove = this.onMenuItemMouseMove.bind(this);
     this.onMenuItemMouseEnter = this.onMenuItemMouseEnter.bind(this);
     this.setMenuStyles = this.setMenuStyles.bind(this);
   }
 
+
   public handleMount() {
-    window.addEventListener("scroll", this.closeMenu);
-    window.addEventListener("resize", this.closeMenu);
+    document.addEventListener("scroll", this.closeMenu);
+    document.addEventListener("resize", this.closeMenu);
+    document.addEventListener("click", this.handleClickOutside, true);
   }
 
   public handleUnmount() {
-    window.removeEventListener("scroll", this.closeMenu);
-    window.removeEventListener("resize", this.closeMenu);
+    document.removeEventListener("scroll", this.closeMenu);
+    document.removeEventListener("resize", this.closeMenu);
+    document.removeEventListener("click", this.handleClickOutside, true);
   }
 
-  public onControlBlur() {
-    this.closeMenu();
-  }
+  handleClickOutside(event: any) {
+    if (this.refs.containerRef?.current && !this.refs.containerRef?.current.contains(event.target)) {
+      this.closeMenu();
+    }
+  };
 
   onMenuItemMouseMove(menuItemIndex: number) {
-    const state = this.getState();
+    const { activeMenuItemIndex, menuItemsHover } = this.getState();
 
-    const { activeMenuItemIndex } = state;
-    if (!state.menuItemsHover) {
+
+    if (!menuItemsHover) {
       this.setState({
         menuItemsHover: true
       });
@@ -149,7 +152,7 @@ implements ControlWithDropDownMenuType<Option>{
     }
 
     this.closeMenu();
-    this.setState({ userInput: "" });
+    this.setState({ userInput: this.getUserInput(menuItem) });
     onChangeCallback(menuItem);
   };
 
@@ -178,9 +181,9 @@ implements ControlWithDropDownMenuType<Option>{
         return;
       }
 
-      this.closeMenu();
       onChangeCallback(dropdownMenuItemsData[activeMenuItemIndex]);
-
+      this.setState({ userInput: this.getUserInput(dropdownMenuItemsData[activeMenuItemIndex]) });
+      this.closeMenu();
     }
 
     // User pressed the esc key
@@ -225,6 +228,17 @@ implements ControlWithDropDownMenuType<Option>{
         menuItemsHover: false
       });
     }
+
+    /*
+     *if (eventKey === "Backspace") {
+     *const selection = document?.getSelection()?.toString();
+     *const { userInput } = this.getState();
+     *
+     *if (selection === userInput) {
+     *  this.setState({ userInput: "" });
+     *}
+     *}
+     */
   };
 
   public setMenuStyles(containerRef: RefObject<HTMLDivElement>): CSSProperties {

@@ -96,7 +96,7 @@ export const Select = <Option extends StandardOption, >(
           className={cn(styles.controlButton)}
           type="button"
           onKeyDown={Service.onSelectControlKeyDown}
-          // onBlur={onControlBlur}
+          onBlur={Service.controlWithDropDownMenu.onControlBlur}
           onClick={Service.onSelectClick}
         >
           {getLabel(value)}

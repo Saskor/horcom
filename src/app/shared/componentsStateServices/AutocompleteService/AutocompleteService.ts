@@ -1,26 +1,32 @@
-import React, { RefObject } from "react";
+import React, { CSSProperties, RefObject } from "react";
 import { debounce } from "../../helpers/customDebounce";
 import { StandardOption } from "../types";
 import { ControlWithDropDownMenu } from "../ControlWithDropDownMenu";
-import { AutocompleteStateType } from "../../components/Autocomplete/Autocomplete";
+
+export type AutocompleteServiceStateType<Option> = {
+  activeMenuItemIndex: null | number;
+  showDropdownMenu: boolean;
+  menuStyles: CSSProperties;
+  menuItemsHover: boolean;
+  filteredSuggestions: Array<Option>;
+  userInput: string;
+}
 
 export type AutocompleteServiceParamsType<Option> = {
-  componentStateManageHelpers: {
-    getComponentState: () => AutocompleteStateType<Option>,
-    setComponentState: (newStatePart: Partial<AutocompleteStateType<Option>>) => void,
-  };
+  incrementComponentStateChangedCounter: () => void;
   serviceCallbacks: {
     getFilteredSuggestions: (inputValue: string) => Array<Option>;
     onChange: (newValue: Option) => void;
     getLabel: (newValue: Option) => string;
   };
   refs: {containerRef: RefObject<HTMLDivElement>};
-  initialState: AutocompleteStateType<Option>;
 };
 
 export type AutocompleteServiceType<Option> = {
   handleMount: () => void;
   handleUnmount: () => void;
+  setState: (newStatePart: Partial<AutocompleteServiceStateType<Option>>) => void;
+  getState: () => AutocompleteServiceStateType<Option>;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAutocompleteControlKeyDown: (e: React.KeyboardEvent) => void;
   onMenuItemClick: (menuItem: Option) => void;
@@ -30,9 +36,23 @@ export type AutocompleteServiceType<Option> = {
 
 export class AutocompleteService<Option extends StandardOption>
 implements AutocompleteServiceType<Option> {
-  private readonly setState;
+  private state: AutocompleteServiceStateType<Option> = {
+    activeMenuItemIndex: null,
+    showDropdownMenu: false,
+    menuStyles: {
+      position: undefined,
+      top: "0px",
+      left: "0px",
+      width: "0px"
+    },
+    menuItemsHover: true,
+    filteredSuggestions: [],
+    userInput: ""
+  };
 
-  private readonly getState;
+  public readonly setState;
+
+  public readonly getState;
 
   private readonly serviceCallbacks;
 
@@ -42,24 +62,42 @@ implements AutocompleteServiceType<Option> {
 
   constructor(
     {
-      componentStateManageHelpers,
+      incrementComponentStateChangedCounter,
       serviceCallbacks,
-      refs,
-      initialState
+      refs
     }: AutocompleteServiceParamsType<Option>
   ) {
-    this.setState = componentStateManageHelpers.setComponentState;
-    this.getState = componentStateManageHelpers.getComponentState;
+    this.setState = (newStatePart: Partial<AutocompleteServiceStateType<Option>>) => {
+      this.state = { ...this.state, ...newStatePart };
+      incrementComponentStateChangedCounter();
+    };
+
+    this.getState = () => this.state;
     this.serviceCallbacks = serviceCallbacks;
     this.refs = refs;
 
 
-    this.controlWithDropDownMenu = new ControlWithDropDownMenu<Option, AutocompleteStateType<Option>>(
+    this.controlWithDropDownMenu = new ControlWithDropDownMenu<Option, AutocompleteServiceStateType<Option>>(
       {
-        componentStateManageHelpers,
+        componentStateManageHelpers: {
+          getComponentState: this.getState,
+          setComponentState: this.setState
+        },
         serviceCallbacks,
         refs,
-        initialState
+        initialState: {
+          activeMenuItemIndex: null,
+          showDropdownMenu: false,
+          menuStyles: {
+            position: undefined,
+            top: "0px",
+            left: "0px",
+            width: "0px"
+          },
+          menuItemsHover: true,
+          filteredSuggestions: [],
+          userInput: ""
+        }
       }
     );
   }
