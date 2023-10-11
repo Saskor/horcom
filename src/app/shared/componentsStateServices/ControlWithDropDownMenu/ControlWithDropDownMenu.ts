@@ -62,8 +62,6 @@ implements ControlWithDropDownMenuType<Option>{
   
   public readonly closeMenu;
 
-  private readonly clearState;
-
   constructor(
     {
       componentStateManageHelpers,
@@ -83,14 +81,13 @@ implements ControlWithDropDownMenuType<Option>{
       this.setState({ ...rest });
     };
 
-    this.clearState = () => this.setState({ ...initialState });
-
     this.handleMount = this.handleMount.bind(this);
     this.handleUnmount = this.handleUnmount.bind(this);
     this.onMenuItemClick = this.onMenuItemClick.bind(this);
     this.onMenuItemMouseMove = this.onMenuItemMouseMove.bind(this);
     this.onMenuItemMouseEnter = this.onMenuItemMouseEnter.bind(this);
     this.setMenuStyles = this.setMenuStyles.bind(this);
+    this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
 
@@ -107,7 +104,9 @@ implements ControlWithDropDownMenuType<Option>{
   }
 
   handleClickOutside(event: any) {
-    if (this.refs.containerRef?.current && !this.refs.containerRef?.current.contains(event.target)) {
+    const { containerRef } = this.refs || {};
+
+    if (containerRef.current && !containerRef.current.contains(event.target)) {
       this.closeMenu();
     }
   };
@@ -228,17 +227,6 @@ implements ControlWithDropDownMenuType<Option>{
         menuItemsHover: false
       });
     }
-
-    /*
-     *if (eventKey === "Backspace") {
-     *const selection = document?.getSelection()?.toString();
-     *const { userInput } = this.getState();
-     *
-     *if (selection === userInput) {
-     *  this.setState({ userInput: "" });
-     *}
-     *}
-     */
   };
 
   public setMenuStyles(containerRef: RefObject<HTMLDivElement>): CSSProperties {
@@ -258,7 +246,8 @@ implements ControlWithDropDownMenuType<Option>{
       position: "absolute",
       top: `${containerCoords.bottom}px`,
       left: `${containerCoords.left}px`,
-      width: `${containerCoords.right - containerCoords.left}px`
+      width: `${containerCoords.right - containerCoords.left}px`,
+      height: "100%"
     });
   }
 }
