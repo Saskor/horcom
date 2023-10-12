@@ -29,7 +29,7 @@ export const SearchPageFilters = observer((
         getFilteredSuggestions={createSubcategoryOptions}
         fieldName="subcategory"
         onFieldChange={onChangeFilterFormValue}
-        placeholder="Что искать"
+        placeholder="Название услуги"
       />
       <FieldAutocomplete<SearchablePlace>
         getFilteredSuggestions={getSearchablePlaceOptions}

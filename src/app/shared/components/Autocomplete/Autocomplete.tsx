@@ -70,6 +70,7 @@ export const Autocomplete = <Option extends StandardOption, >(
         ref={containerRef}
       >
         <input
+          className={cn(styles.input)}
           type="text"
           onChange={Service.onInputChange}
           onKeyDown={Service.onAutocompleteControlKeyDown}

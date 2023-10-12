@@ -23,44 +23,43 @@ export const SearchPageListItem = ({
         <img alt={"фото"} src={dataItem.profilePhotoLink} />
       </div>
       <div className={cn(styles.infoContainer)}>
+
         <div className={cn(styles.infoName)}>{dataItem.name}</div>
         <div className={cn(styles.infoRow)}>{"Профиль VK: "}
           <a href={`https://vk.com/${dataItem.vkProfile}`} target="_blank" rel="noreferrer">
             Ссылка на профиль VK
           </a>
         </div>
+
         <div className={cn(styles.infoRow)}>
           {"Номер телефона: "}
           <a href={`tel:${dataItem.phoneNumber}`}>
             {dataItem.phoneNumber}
           </a>
         </div>
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-        <div
-          className={cn(styles.infoRow)}
-          onClick={copyText}
-          role="button" tabIndex={0}
-        >
-          Хештег для размещения отзыва в VK: <span>{dataItem.reviewsHashtag}</span>
-          <Tooltip
-            text="Копировать хештег"
-            tooltipPlacement={E_TOOLTIP_PLACEMENT.BOTTOM}
-          >
-            <div className={cn(styles.flipHorizontal)}><FiCopy /></div>
-          </Tooltip>
 
-        </div>
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
         <div className={cn(styles.infoRow)}>
           {"Отзывы в VK: "}
           <a
             href={VK_SEARCH_REVIEWS_PAGE.replace(
-                "__hashtag__",
-                dataItem.reviewsHashtag
+              "__hashtag__",
+              dataItem.reviewsHashtag
             )}
           >
             {dataItem.reviewsHashtag}
           </a>
         </div>
+
+        <button
+          className={cn(styles.infoRow)}
+          onClick={copyText}
+          type="button"
+          tabIndex={0}
+        >
+          Скопировать хештег для размещения отзыва в VK
+        </button>
+
       </div>
     </div>
   );

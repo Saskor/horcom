@@ -93,20 +93,22 @@ implements ControlWithDropDownMenuType<Option>{
 
   public handleMount() {
     document.addEventListener("scroll", this.closeMenu);
-    document.addEventListener("resize", this.closeMenu);
-    document.addEventListener("click", this.handleClickOutside, true);
+    window.addEventListener("resize", this.closeMenu);
+    document.addEventListener("click", this.handleClickOutside, { capture: true });
   }
 
   public handleUnmount() {
     document.removeEventListener("scroll", this.closeMenu);
-    document.removeEventListener("resize", this.closeMenu);
-    document.removeEventListener("click", this.handleClickOutside, true);
+    window.removeEventListener("resize", this.closeMenu);
+    document.removeEventListener("click", this.handleClickOutside);
   }
 
   handleClickOutside(event: any) {
     const { containerRef } = this.refs || {};
+    const clickInsideInput = containerRef.current && containerRef.current.contains(event.target);
+    const clickInsidePortal = event.target.closest("#portal-root");
 
-    if (containerRef.current && !containerRef.current.contains(event.target)) {
+    if (!clickInsideInput && !clickInsidePortal) {
       this.closeMenu();
     }
   };
