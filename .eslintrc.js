@@ -1,6 +1,6 @@
 module.exports = {
   globals: {
-    JSX: true,
+    JSX: true
   },
   extends: [
     "plugin:jsx-a11y/recommended",
@@ -13,8 +13,6 @@ module.exports = {
   ],
   settings: {
     "import/extensions": [
-      ".js",
-      ".jsx",
       ".ts",
       ".tsx"
     ],
