@@ -119,7 +119,7 @@ module.exports = {
     "react/jsx-filename-extension": [ "error", { extensions: [ ".tsx" ] } ],
     "react/jsx-first-prop-new-line": "error",
     "react/jsx-fragments": [ "error", "element" ],
-    "react/jsx-handler-names": 1,
+    // "react/jsx-handler-names": 1,
     "react/jsx-indent": [ "error", 2, { checkAttributes: true, indentLogicalExpressions: true } ],
     "react/jsx-key": "error",
     "react/jsx-max-props-per-line": [ "error", { maximum: 3, when: "always" } ],
