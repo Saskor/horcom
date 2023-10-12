@@ -1,5 +1,5 @@
-class TextHelper {
-  private fallbackCopyTextToClipboard(text: string) {
+export const useCopyText = () => {
+  const fallbackCopyTextToClipboard = (text: string) => {
     const textArea = document.createElement("textarea");
     textArea.value = text;
 
@@ -19,20 +19,20 @@ class TextHelper {
     }
 
     document.body.removeChild(textArea);
-  }
+  };
 
-  public async copyTextToClipboard(text: string) {
+  const copyTextToClipboard = async (text: string) => {
     if (!navigator.clipboard) {
-      this.fallbackCopyTextToClipboard(text);
+      fallbackCopyTextToClipboard(text);
 
       return;
     }
     try {
       await navigator.clipboard.writeText(text);
     } catch (err) {
-      throw new Error("Async: Could not copy text: ");
+      throw new Error("Невозможно скопировать текст");
     }
-  }
-}
+  };
 
-export default new TextHelper();
+  return { copyTextToClipboard };
+};

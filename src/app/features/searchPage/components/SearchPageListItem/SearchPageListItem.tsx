@@ -1,21 +1,17 @@
-import React, { useRef } from "react";
+import React from "react";
 import cn from "classnames";
-import { FiCopy } from "react-icons/fi";
 import { ServicesProviderOrManufacturer, VK_SEARCH_REVIEWS_PAGE } from "../../constants/searchPage";
-import { Tooltip } from "../../../../shared/components/Tooltip";
-import { E_TOOLTIP_PLACEMENT } from "../../../../shared/constants/tooltip";
 import styles from "./SearchPageListItem.scss";
-import TextHelper from "app/shared/services/text";
+import { useCopyText } from "app/shared/services/text";
 
 export const SearchPageListItem = ({
   dataItem
 }: { dataItem: ServicesProviderOrManufacturer }) => {
+  const { copyTextToClipboard } = useCopyText();
   const copyText = React.useCallback(
-    () => TextHelper.copyTextToClipboard(dataItem.reviewsHashtag),
+    () => copyTextToClipboard(dataItem.reviewsHashtag),
     [ dataItem.reviewsHashtag ]
   );
-
-  const hashtagRef = useRef(null);
 
   return (
     <div className={cn(styles.container)}>
