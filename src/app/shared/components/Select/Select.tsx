@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef, CSSProperties, RefObject } from "react";
+import React, { Fragment, useState, useRef, RefObject } from "react";
 import cn from "classnames";
 import { FaChevronDown } from "react-icons/fa";
 import { Portal } from "../Portal";
@@ -13,14 +13,6 @@ import {
   SelectServiceParamsType
 } from "../../componentsStateServices/SelectService";
 import styles from "./Select.scss";
-
-export type SelectStateType<Option> = {
-  activeMenuItemIndex: null | number;
-  showDropdownMenu: boolean;
-  menuStyles: CSSProperties;
-  menuItemsHover: boolean;
-  dropdownMenuItemsData: Array<Option>;
-}
 
 export const Select = <Option extends StandardOption, >(
   {
@@ -41,29 +33,16 @@ export const Select = <Option extends StandardOption, >(
 ) => {
   const containerRef: RefObject<HTMLDivElement> = useRef(null);
 
-  const initialState: SelectStateType<Option> = {
-    activeMenuItemIndex: null,
-    showDropdownMenu: false,
-    menuStyles: {
-      position: undefined,
-      top: "0px",
-      left: "0px",
-      width: "0px"
-    },
-    menuItemsHover: true,
-    dropdownMenuItemsData
-  };
+  const [
+    ,
+    setComponentState
+  ] = useState<{ stateChangedCounter: number }>({ stateChangedCounter: 0 });
 
-  const [ state, setComponentState ] = useState<SelectStateType<Option>>(initialState);
-
-  const setState = (newStatePart: Partial<SelectStateType<Option>>) => {
+  const incrementComponentStateChangedCounter = () => {
     setComponentState(currentState => ({
-      ...currentState,
-      ...newStatePart
+      stateChangedCounter: currentState.stateChangedCounter + 1
     }));
   };
-
-  const getState = () => state;
 
   const Service = useComponentService<
     SelectService<Option>,
@@ -72,16 +51,13 @@ export const Select = <Option extends StandardOption, >(
       {
         Service: SelectService,
         serviceParams: {
-          componentStateManageHelpers: {
-            getComponentState: getState,
-            setComponentState: setState
-          },
+          incrementComponentStateChangedCounter,
           serviceCallbacks: {
             onChange,
             getLabel
           },
           refs: { containerRef },
-          initialState
+          data: { dropdownMenuItemsData }
         }
       }
     ) as SelectService<Option>;
@@ -96,26 +72,25 @@ export const Select = <Option extends StandardOption, >(
           className={cn(styles.controlButton)}
           type="button"
           onKeyDown={Service.onSelectControlKeyDown}
-          onBlur={Service.controlWithDropDownMenu.onControlBlur}
           onClick={Service.onSelectClick}
         >
           {getLabel(value)}
           <FaChevronDown />
         </button>
       </div>
-      {state.showDropdownMenu && (
+      {Service.getState().showDropdownMenu && (
         <Portal
           portalRootElementId={dropdownMenuPortalTargetId}
         >
           <DropdownMenu<Option>
             menuItemsData={dropdownMenuItemsData}
-            menuItemsHover={state.menuItemsHover}
-            activeSuggestionIndex={state.activeMenuItemIndex}
+            menuItemsHover={Service.getState().menuItemsHover}
+            activeSuggestionIndex={Service.getState().activeMenuItemIndex}
             onMenuItemClick={Service.onMenuItemClick}
             onMenuItemMouseEnter={Service.controlWithDropDownMenu.onMenuItemMouseEnter}
             onMenuItemMouseMove={Service.controlWithDropDownMenu.onMenuItemMouseMove}
             onMenuMouseLeave={Service.onMenuMouseLeave}
-            menuStyles={state.menuStyles}
+            menuStyles={Service.getState().menuStyles}
             getLabel={getLabel}
             MenuItemComponent={MenuItemComponent}
           />

@@ -1,36 +1,53 @@
-import React, { RefObject } from "react";
+import React, { CSSProperties, RefObject } from "react";
 import { StandardOption } from "../types";
 import { ControlWithDropDownMenu } from "../ControlWithDropDownMenu";
-import { SelectStateType } from "../../components/Select/Select";
+
+export type SelectServiceStateType = {
+  activeMenuItemIndex: null | number;
+  showDropdownMenu: boolean;
+  menuStyles: CSSProperties;
+  menuItemsHover: boolean;
+}
 
 export type SelectServiceParamsType<Option> = {
-  componentStateManageHelpers: {
-    getComponentState: () => SelectStateType<Option>;
-    setComponentState: (newStatePart: Partial<SelectStateType<Option>>) => void;
-  };
+  incrementComponentStateChangedCounter: () => void;
   serviceCallbacks: {
     onChange: (newValue: Option) => void;
     getLabel: (newValue: Option) => string;
   };
   refs: {containerRef: RefObject<HTMLDivElement>};
-  initialState: SelectStateType<Option>;
+  data: {dropdownMenuItemsData: Array<Option>}
 };
 
 export type SelectServiceType<Option> = {
   handleMount: () => void;
   handleUnmount: () => void;
+  setState: (newStatePart: Partial<SelectServiceStateType>) => void;
+  getState: () => SelectServiceStateType;
   onSelectClick: () => void;
   onSelectControlKeyDown: (e: React.KeyboardEvent) => void;
   onMenuItemClick: (menuItem: Option) => void;
   onMenuMouseLeave: () => void;
+  controlWithDropDownMenu: ControlWithDropDownMenu<Option, SelectServiceStateType>;
 }
 
 export class SelectService<Option extends StandardOption>
 implements SelectServiceType<Option> {
+  private state: SelectServiceStateType = {
+    activeMenuItemIndex: null,
+    showDropdownMenu: false,
+    menuStyles: {
+      position: undefined,
+      top: "0px",
+      left: "0px",
+      width: "0px"
+    },
+    menuItemsHover: true
+  }
 
-  private readonly setState;
+  public readonly setState;
 
-  private readonly getState;
+  public readonly getState;
 
   private readonly serviceCallbacks;
 
@@ -38,26 +55,46 @@ implements SelectServiceType<Option> {
 
   public controlWithDropDownMenu;
 
+  private readonly data;
+
   constructor(
     {
-      componentStateManageHelpers,
+      incrementComponentStateChangedCounter,
       serviceCallbacks,
       refs,
-      initialState
+      data
     }: SelectServiceParamsType<Option>
   ) {
-    this.setState = componentStateManageHelpers.setComponentState;
-    this.getState = componentStateManageHelpers.getComponentState;
+    this.setState = (newStatePart: Partial<SelectServiceStateType>) => {
+      this.state = { ...this.state, ...newStatePart };
+      incrementComponentStateChangedCounter();
+    };
+    this.getState = () => this.state;
+
     this.serviceCallbacks = serviceCallbacks;
     this.refs = refs;
+    this.data = data;
 
 
-    this.controlWithDropDownMenu = new ControlWithDropDownMenu<Option, SelectStateType<Option>>(
+    this.controlWithDropDownMenu = new ControlWithDropDownMenu<Option, SelectServiceStateType>(
       {
-        componentStateManageHelpers,
+        componentStateManageHelpers: {
+          getComponentState: this.getState,
+          setComponentState: this.setState
+        },
         serviceCallbacks,
         refs,
-        initialState
+        initialState: {
+          activeMenuItemIndex: null,
+          showDropdownMenu: false,
+          menuStyles: {
+            position: undefined,
+            top: "0px",
+            left: "0px",
+            width: "0px"
+          },
+          menuItemsHover: true
+        }
       }
     );
   }
@@ -73,7 +110,7 @@ implements SelectServiceType<Option> {
   }
 
   onSelectClick = () => {
-    const { showDropdownMenu: showDropdownMenuPrev } = this.getState();
+    const { showDropdownMenu: showDropdownMenuPrev } = this.state;
 
     if (!showDropdownMenuPrev) {
       this.setState({
@@ -88,10 +125,8 @@ implements SelectServiceType<Option> {
   };
 
   onSelectControlKeyDown = (e: React.KeyboardEvent) => {
-    const {
-      activeMenuItemIndex,
-      dropdownMenuItemsData = []
-    } = this.getState();
+    const { activeMenuItemIndex } = this.state;
+    const { dropdownMenuItemsData } = this.data;
 
     const { onChange: onChangeCallback } = this.serviceCallbacks;
 
