@@ -249,8 +249,7 @@ implements ControlWithDropDownMenuType<Option>{
       position: "absolute",
       top: `${containerCoords.bottom}px`,
       left: `${containerCoords.left}px`,
-      width: `${containerCoords.right - containerCoords.left}px`,
-      height: "100%"
+      width: `${containerCoords.right - containerCoords.left}px`
     });
   }
 }
