@@ -31,7 +31,7 @@ export type AutocompleteServiceType<Option> = {
   onAutocompleteControlKeyDown: (e: React.KeyboardEvent) => void;
   onMenuItemClick: (menuItem: Option) => void;
   onMenuMouseLeave: () => void;
-  controlWithDropDownMenu: any;
+  controlWithDropDownMenu: ControlWithDropDownMenu<Option, AutocompleteServiceStateType<Option>>;
 }
 
 export class AutocompleteService<Option extends StandardOption>
