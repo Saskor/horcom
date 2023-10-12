@@ -1,4 +1,4 @@
-import { StandardOption } from "../../../shared/componentsStateServices/ServiceBase";
+import { StandardOption } from "../../../shared/componentsStateServices/types";
 
 export const REGIONS: {[index: number]: string} = {
   1: "Республика Адыгея",
@@ -104,7 +104,7 @@ export type SearchablePlace = {
 } & StandardOption;
 
 export type SearchablePlaceSuggestion = {
-  displayPriority: number; /** Number from 1 and bigger*/
+  displayPriority: number;
 } & SearchablePlace;
 
 export const SEARCHABLE_PLACES: Array<SearchablePlaceSuggestion> = [

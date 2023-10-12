@@ -1,16 +1,19 @@
 export function debounce(
   { fn, ms, context }:
-    { fn: any, ms: number, context: any }
-) {
-  let timerId: any = null;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    { fn: Function, ms: number, context: unknown }
+  // eslint-disable-next-line @typescript-eslint/ban-types
+): Function {
 
-  return function (...restParams: any) {
+  let timerId: number;
+
+  return function (...restParams: []) {
     if (timerId) {
-      clearTimeout(timerId);
+      window.clearTimeout(timerId);
     }
 
-    timerId = setTimeout(() => {
-      clearTimeout(timerId);
+    timerId = window.setTimeout(() => {
+      window.clearTimeout(timerId);
       fn.apply(context, restParams);
     }, ms);
   };

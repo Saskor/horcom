@@ -128,13 +128,15 @@ implements AutocompleteServiceType<Option> {
       userInput: e.currentTarget.value
     });
 
-    debounce(
+    const debouncedWrapper = debounce(
       {
         fn: this.inputChangeCallback,
         ms: 1000,
         context: this
       }
-    )(e.currentTarget.value);
+    );
+
+    debouncedWrapper(e.currentTarget.value);
   };
 
   onAutocompleteControlKeyDown = (e: React.KeyboardEvent) => {

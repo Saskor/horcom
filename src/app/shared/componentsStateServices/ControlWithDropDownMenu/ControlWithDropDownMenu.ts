@@ -103,10 +103,11 @@ implements ControlWithDropDownMenuType<Option>{
     document.removeEventListener("click", this.handleClickOutside);
   }
 
-  handleClickOutside(event: any) {
+  handleClickOutside(event: Event) {
     const { containerRef } = this.refs || {};
-    const clickInsideInput = containerRef.current && containerRef.current.contains(event.target);
-    const clickInsidePortal = event.target.closest("#portal-root");
+    const clickInsideInput = containerRef.current
+      && containerRef.current.contains(event.target as HTMLElement);
+    const clickInsidePortal = (event.target as HTMLElement).closest("#portal-root");
 
     if (!clickInsideInput && !clickInsidePortal) {
       this.closeMenu();

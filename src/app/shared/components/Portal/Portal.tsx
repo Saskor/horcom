@@ -25,9 +25,9 @@ export const Portal = (
     }
 
     return () => {
-      (portalRootElement && el.current)
-        ? portalRootElement.removeChild(el.current)
-        : null;
+      if (portalRootElement && el.current) {
+        portalRootElement.removeChild(el.current);
+      }
     };
   }, [ portalRootElementId ]);
 

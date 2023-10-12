@@ -178,7 +178,8 @@ class SearchPageStoreClass {
     requestParams: FilterFormValues,
     data: Array<ServicesProviderOrManufacturer>
   ): void => {
-    console.log(requestParams, data);
+    // log data
+    JSON.stringify({ requestParams, data });
   }
 
   public requestData = (
