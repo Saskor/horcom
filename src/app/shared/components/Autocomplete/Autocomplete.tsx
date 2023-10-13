@@ -59,16 +59,11 @@ export const Autocomplete = <Option extends StandardOption, >(
             onChange,
             getLabel
           },
-          refs: { containerRef }
+          refs: { containerRef },
+          data: { initialValue }
         }
       }
     ) as AutocompleteServiceType<Option>;
-
-  const { anyControlOptionWasSelected, userInput } = Service.getState();
-  const initialValueLabel = getLabel(initialValue);
-  const displayedValue = (initialValueLabel && !anyControlOptionWasSelected)
-    ? initialValueLabel
-    : userInput;
 
   return (
     <Fragment>
@@ -81,7 +76,7 @@ export const Autocomplete = <Option extends StandardOption, >(
           type="text"
           onChange={Service.onInputChange}
           onKeyDown={Service.onAutocompleteControlKeyDown}
-          value={displayedValue}
+          value={Service.getState().userInput}
           placeholder={placeholder}
         />
       </div>

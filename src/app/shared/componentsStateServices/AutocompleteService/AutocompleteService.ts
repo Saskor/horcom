@@ -10,7 +10,6 @@ export type AutocompleteServiceStateType<Option> = {
   menuItemsHover: boolean;
   filteredSuggestions: Array<Option>;
   userInput: string;
-  anyControlOptionWasSelected: boolean;
 }
 
 export type AutocompleteServiceParamsType<Option> = {
@@ -21,6 +20,7 @@ export type AutocompleteServiceParamsType<Option> = {
     getLabel: (newValue: Option) => string;
   };
   refs: {containerRef: RefObject<HTMLDivElement>};
+  data: { initialValue: Option }
 };
 
 export type AutocompleteServiceType<Option> = {
@@ -48,8 +48,7 @@ implements AutocompleteServiceType<Option> {
     },
     menuItemsHover: true,
     filteredSuggestions: [],
-    userInput: "",
-    anyControlOptionWasSelected: false
+    userInput: ""
   };
 
   public readonly setState;
@@ -66,7 +65,8 @@ implements AutocompleteServiceType<Option> {
     {
       incrementComponentStateChangedCounter,
       serviceCallbacks,
-      refs
+      refs,
+      data: { initialValue }
     }: AutocompleteServiceParamsType<Option>
   ) {
     this.setState = (newStatePart: Partial<AutocompleteServiceStateType<Option>>) => {
@@ -78,6 +78,7 @@ implements AutocompleteServiceType<Option> {
     this.serviceCallbacks = serviceCallbacks;
     this.refs = refs;
 
+    this.state.userInput = this.serviceCallbacks.getLabel(initialValue);
 
     this.controlWithDropDownMenu = new ControlWithDropDownMenu<Option, AutocompleteServiceStateType<Option>>(
       {
@@ -98,8 +99,7 @@ implements AutocompleteServiceType<Option> {
           },
           menuItemsHover: true,
           filteredSuggestions: [],
-          userInput: "",
-          anyControlOptionWasSelected: false
+          userInput: ""
         }
       }
     );
@@ -120,8 +120,7 @@ implements AutocompleteServiceType<Option> {
 
     this.setState({
       showDropdownMenu: Boolean(userInput),
-      filteredSuggestions,
-      anyControlOptionWasSelected: !userInput && !this.getState().anyControlOptionWasSelected
+      filteredSuggestions
     });
   }
 

@@ -6,7 +6,7 @@ type ControlWithDropDownMenuState = {
   menuStyles: CSSProperties;
   menuItemsHover: boolean;
   userInput?: string;
-  anyControlOptionWasSelected: boolean;
+  anyControlOptionWasSelected?: boolean;
 };
 
 
