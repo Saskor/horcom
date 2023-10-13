@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback } from "react";
 import cn from "classnames";
 import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/types";
 
@@ -25,16 +25,16 @@ export const DropdownMenuItem = <Option extends StandardOption, >(
     getLabel
   }: MenuItemProps<Option>
 ) => {
-  const onItemMouseMove = useMemo(
-    () => () => onMenuItemMouseMove(index),
+  const onItemMouseMove = useCallback(
+    () => onMenuItemMouseMove(index),
     [ index, onMenuItemMouseMove ]
   );
-  const onItemMouseEnter = useMemo(
-    () => () => onMenuItemMouseEnter(index),
+  const onItemMouseEnter = useCallback(
+    () => onMenuItemMouseEnter(index),
     [ index, onMenuItemMouseEnter ]
   );
-  const onItemClick = useMemo(
-    () => () => onMenuItemClick(menuItemData),
+  const onItemClick = useCallback(
+    () => onMenuItemClick(menuItemData),
     [ onMenuItemClick, menuItemData ]
   );
 
