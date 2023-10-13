@@ -1,6 +1,7 @@
 import React from "react";
 import { Autocomplete } from "../Autocomplete";
 import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/types";
+import { FilterFormValues } from "app/features/searchPage/stores/searchPageStore";
 
 export const FieldAutocomplete = <Option extends StandardOption, >(
   {
@@ -9,14 +10,16 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
     fieldName,
     onFieldChange,
     getLabel,
-    placeholder = ""
+    placeholder = "",
+    formValues
   }: {
     getFilteredSuggestions: (inputValue: string) => Array<Option>;
     MenuItemComponent?: MenuItemComponentType<Option>;
-    fieldName: string;
+    fieldName: keyof FilterFormValues;
     onFieldChange: (changingFieldName: string, value: Option) => void;
     getLabel?: (newValue: Option) => string;
     placeholder?: string;
+    formValues: { [key: string]: any };
   }
 ) => {
   const onChange = React.useCallback(
@@ -32,6 +35,7 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
       onChange={onChange}
       getLabel={getLabel}
       placeholder={placeholder}
+      initialValue={formValues[fieldName]}
     />
   );
 };

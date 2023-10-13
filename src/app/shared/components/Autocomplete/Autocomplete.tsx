@@ -21,7 +21,8 @@ export const Autocomplete = <Option extends StandardOption, >(
     dropdownMenuPortalTargetId,
     onChange,
     getLabel = (dataItem: Option) => dataItem.label || "",
-    placeholder = ""
+    placeholder = "",
+    initialValue
   }: {
     getFilteredSuggestions: (inputValue: string) => Array<Option>;
     MenuItemComponent?: MenuItemComponentType<Option>;
@@ -29,6 +30,7 @@ export const Autocomplete = <Option extends StandardOption, >(
     onChange: (newValue: Option) => void;
     getLabel?: (newValue: Option) => string;
     placeholder?: string,
+    initialValue: Option
   }
 ) => {
   const containerRef: RefObject<HTMLDivElement> = useRef(null);
@@ -62,8 +64,13 @@ export const Autocomplete = <Option extends StandardOption, >(
       }
     ) as AutocompleteServiceType<Option>;
 
-  return (
+  const { anyControlOptionWasSelected, userInput } = Service.getState();
+  const initialValueLabel = getLabel(initialValue);
+  const displayedValue = (initialValueLabel && !anyControlOptionWasSelected)
+    ? initialValueLabel
+    : userInput;
 
+  return (
     <Fragment>
       <div
         className={cn(styles.container)}
@@ -74,7 +81,7 @@ export const Autocomplete = <Option extends StandardOption, >(
           type="text"
           onChange={Service.onInputChange}
           onKeyDown={Service.onAutocompleteControlKeyDown}
-          value={Service.getState().userInput}
+          value={displayedValue}
           placeholder={placeholder}
         />
       </div>

@@ -6,6 +6,7 @@ type ControlWithDropDownMenuState = {
   menuStyles: CSSProperties;
   menuItemsHover: boolean;
   userInput?: string;
+  anyControlOptionWasSelected: boolean;
 };
 
 
@@ -77,7 +78,7 @@ implements ControlWithDropDownMenuType<Option>{
     
     this.closeMenu = () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { userInput, ...rest } = initialState;
+      const { userInput, anyControlOptionWasSelected, ...rest } = initialState;
       this.setState({ ...rest });
     };
 
@@ -154,7 +155,7 @@ implements ControlWithDropDownMenuType<Option>{
     }
 
     this.closeMenu();
-    this.setState({ userInput: this.getUserInput(menuItem) });
+    this.setState({ userInput: this.getUserInput(menuItem), anyControlOptionWasSelected: true });
     onChangeCallback(menuItem);
   };
 
@@ -186,6 +187,7 @@ implements ControlWithDropDownMenuType<Option>{
       onChangeCallback(dropdownMenuItemsData[activeMenuItemIndex]);
       this.setState({ userInput: this.getUserInput(dropdownMenuItemsData[activeMenuItemIndex]) });
       this.closeMenu();
+      this.setState({ anyControlOptionWasSelected: true });
     }
 
     // User pressed the esc key

@@ -10,6 +10,7 @@ export type AutocompleteServiceStateType<Option> = {
   menuItemsHover: boolean;
   filteredSuggestions: Array<Option>;
   userInput: string;
+  anyControlOptionWasSelected: boolean;
 }
 
 export type AutocompleteServiceParamsType<Option> = {
@@ -47,7 +48,8 @@ implements AutocompleteServiceType<Option> {
     },
     menuItemsHover: true,
     filteredSuggestions: [],
-    userInput: ""
+    userInput: "",
+    anyControlOptionWasSelected: false
   };
 
   public readonly setState;
@@ -96,7 +98,8 @@ implements AutocompleteServiceType<Option> {
           },
           menuItemsHover: true,
           filteredSuggestions: [],
-          userInput: ""
+          userInput: "",
+          anyControlOptionWasSelected: false
         }
       }
     );
@@ -117,7 +120,8 @@ implements AutocompleteServiceType<Option> {
 
     this.setState({
       showDropdownMenu: Boolean(userInput),
-      filteredSuggestions
+      filteredSuggestions,
+      anyControlOptionWasSelected: !userInput && !this.getState().anyControlOptionWasSelected
     });
   }
 

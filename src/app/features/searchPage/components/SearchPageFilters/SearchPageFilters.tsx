@@ -18,7 +18,8 @@ export const SearchPageFilters = observer((
     createSubcategoryOptions,
     getSearchablePlaceOptions,
     onChangeFilterFormValue,
-    getSearchablePlaceOptionLabel
+    getSearchablePlaceOptionLabel,
+    filterFormValues
   } = searchPageStore;
 
   React.useEffect(() => init(), [ init ]);
@@ -30,6 +31,7 @@ export const SearchPageFilters = observer((
         fieldName="subcategory"
         onFieldChange={onChangeFilterFormValue}
         placeholder="Название услуги"
+        formValues={filterFormValues}
       />
       <FieldAutocomplete<SearchablePlace>
         getFilteredSuggestions={getSearchablePlaceOptions}
@@ -37,6 +39,7 @@ export const SearchPageFilters = observer((
         onFieldChange={onChangeFilterFormValue}
         getLabel={getSearchablePlaceOptionLabel}
         placeholder="Где искать"
+        formValues={filterFormValues}
       />
     </div>
   );

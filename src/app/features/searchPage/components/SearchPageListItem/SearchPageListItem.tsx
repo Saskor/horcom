@@ -34,6 +34,20 @@ export const SearchPageListItem = ({
           </a>
         </div>
 
+        <div className={cn(styles.infoRow, styles.row)}>
+          {"Регион: "}
+          <div>
+            {dataItem.searchablePlace.region}
+          </div>
+        </div>
+
+        <div className={cn(styles.infoRow, styles.row)}>
+          {"Город: "}
+          <div>
+            {dataItem.searchablePlace.name}
+          </div>
+        </div>
+
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
         <div className={cn(styles.infoRow)}>
           {"Отзывы в VK: "}

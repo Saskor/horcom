@@ -35,7 +35,7 @@ export type FilterFormField = {
   }
 };
 
-type FilterFormValues = {
+export type FilterFormValues = {
   category: FilterFormField;
   subcategory: FilterFormField;
   searchablePlace: SearchablePlace;
@@ -54,9 +54,9 @@ class SearchPageStoreClass {
       value: null
     },
     searchablePlace: {
-      name: "Москва",
+      name: "Россия",
       regionDistrict: null,
-      region: "Москва"
+      region: "Россия"
     }
   }
 
@@ -216,6 +216,11 @@ class SearchPageStoreClass {
 
             case "searchablePlace":
               if ("region" in requestParam) {
+                if (valueFromRequestParam === "Россия") {
+                  allConditionsTruthy = true;
+                  break;
+                }
+
                 const needToFilterByWholeRegion: boolean = valueFromRequestParam === requestParam.region;
                 allConditionsTruthy = needToFilterByWholeRegion
                   ? valueFromRequestParam === serviceProducer[requestParamName].region

@@ -109,35 +109,41 @@ export type SearchablePlaceSuggestion = {
 
 export const SEARCHABLE_PLACES: Array<SearchablePlaceSuggestion> = [
   {
+    name: "Россия",
+    regionDistrict: null,
+    region: "Россия",
+    displayPriority: 1
+  },
+  {
     name: "Москва",
     regionDistrict: null,
     region: "Москва",
-    displayPriority: 1
+    displayPriority: 2
   },
   {
     name: "Московская область",
     regionDistrict: null,
     region: "Московская область",
-    displayPriority: 2
+    displayPriority: 3
   },
   {
     name: "Электросталь",
     regionDistrict: null,
     region: "Московская область",
-    displayPriority: 3
+    displayPriority: 4
 
   },
   {
     name: "Ногинск",
     regionDistrict: null,
     region: "Московская область",
-    displayPriority: 3
+    displayPriority: 4
   },
   {
     name: "Ликино-Дулево",
     regionDistrict: null,
     region: "Московская область",
-    displayPriority: 3
+    displayPriority: 4
   }
 ];
 
