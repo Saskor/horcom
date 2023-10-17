@@ -1,4 +1,4 @@
-import { StandardOption } from "../../../shared/componentsStateServices/types";
+import { StandardOption } from "../../../shared/hooks/types";
 
 export const REGIONS: {[index: number]: string} = {
   1: "Республика Адыгея",

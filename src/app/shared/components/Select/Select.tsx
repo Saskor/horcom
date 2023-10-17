@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef, RefObject } from "react";
+import React, { Fragment, useState, useRef, RefObject, CSSProperties } from "react";
 import cn from "classnames";
 import { FaChevronDown } from "react-icons/fa";
 import { Portal } from "../Portal";
@@ -6,13 +6,16 @@ import { DropdownMenu } from "../DropdownMenu";
 import {
   MenuItemComponentType,
   StandardOption
-} from "../../componentsStateServices/types";
-import { useComponentService } from "../../hooks/useComponentService";
-import {
-  SelectService,
-  SelectServiceParamsType
-} from "../../componentsStateServices/SelectService";
+} from "../../hooks/types";
 import styles from "./Select.scss";
+import { useSelectService } from "app/shared/hooks/useSelectService";
+
+export type SelectStateType = {
+  activeMenuItemIndex: null | number;
+  showDropdownMenu: boolean;
+  menuStyles: CSSProperties;
+  menuItemsHover: boolean;
+}
 
 export const Select = <Option extends StandardOption, >(
   {
@@ -31,36 +34,47 @@ export const Select = <Option extends StandardOption, >(
     getLabel?: (newValue: Option) => string;
   }
 ) => {
+  const SELECT_INITIAL_STATE: SelectStateType = {
+    activeMenuItemIndex: null,
+    showDropdownMenu: false,
+    menuStyles: {
+      position: undefined,
+      top: "0px",
+      left: "0px",
+      width: "0px"
+    },
+    menuItemsHover: true
+  };
+
   const containerRef: RefObject<HTMLDivElement> = useRef(null);
 
   const [
-    ,
-    setComponentState
-  ] = useState<{ stateChangedCounter: number }>({ stateChangedCounter: 0 });
+    state,
+    setState
+  ] = useState(SELECT_INITIAL_STATE);
 
-  const incrementComponentStateChangedCounter = () => {
-    setComponentState(currentState => ({
-      stateChangedCounter: currentState.stateChangedCounter + 1
+  const setComponentState = (newStatePart: Partial<SelectStateType>) => {
+    setState(currentState => ({
+      ...currentState,
+      ...newStatePart
     }));
   };
 
-  const Service = useComponentService<
-    SelectService<Option>,
-    SelectServiceParamsType<Option>
-    >(
-      {
-        Service: SelectService,
-        serviceParams: {
-          incrementComponentStateChangedCounter,
-          serviceCallbacks: {
-            onChange,
-            getLabel
-          },
-          refs: { containerRef },
-          data: { dropdownMenuItemsData }
-        }
-      }
-    ) as SelectService<Option>;
+  const selectService = useSelectService<Option>(
+    {
+      data: { dropdownMenuItemsData },
+      stateData: {
+        initialState: SELECT_INITIAL_STATE,
+        state
+      },
+      setComponentState,
+      serviceCallbacks: {
+        onChange,
+        getLabel
+      },
+      refs: { containerRef }
+    }
+  );
 
   return (
     <Fragment>
@@ -71,26 +85,26 @@ export const Select = <Option extends StandardOption, >(
         <button
           className={cn(styles.controlButton)}
           type="button"
-          onKeyDown={Service.onSelectControlKeyDown}
-          onClick={Service.onSelectClick}
+          onKeyDown={selectService.onSelectControlKeyDown}
+          onClick={selectService.onSelectClick}
         >
           {getLabel(value)}
           <FaChevronDown />
         </button>
       </div>
-      {Service.getState().showDropdownMenu && (
+      {state.showDropdownMenu && (
         <Portal
           portalRootElementId={dropdownMenuPortalTargetId}
         >
           <DropdownMenu<Option>
             menuItemsData={dropdownMenuItemsData}
-            menuItemsHover={Service.getState().menuItemsHover}
-            activeSuggestionIndex={Service.getState().activeMenuItemIndex}
-            onMenuItemClick={Service.onMenuItemClick}
-            onMenuItemMouseEnter={Service.controlWithDropDownMenu.onMenuItemMouseEnter}
-            onMenuItemMouseMove={Service.controlWithDropDownMenu.onMenuItemMouseMove}
-            onMenuMouseLeave={Service.onMenuMouseLeave}
-            menuStyles={Service.getState().menuStyles}
+            menuItemsHover={state.menuItemsHover}
+            activeSuggestionIndex={state.activeMenuItemIndex}
+            onMenuItemClick={selectService.onMenuItemClick}
+            onMenuItemMouseEnter={selectService.controlWithDropDownMenu.onMenuItemMouseEnter}
+            onMenuItemMouseMove={selectService.controlWithDropDownMenu.onMenuItemMouseMove}
+            onMenuMouseLeave={selectService.onMenuMouseLeave}
+            menuStyles={state.menuStyles}
             getLabel={getLabel}
             MenuItemComponent={MenuItemComponent}
           />

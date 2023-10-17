@@ -1,6 +1,6 @@
 import React from "react";
 import { Autocomplete } from "../Autocomplete";
-import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/types";
+import { MenuItemComponentType, StandardOption } from "../../hooks/types";
 import { FilterFormValues } from "app/features/searchPage/stores/searchPageStore";
 
 export const FieldAutocomplete = <Option extends StandardOption, >(

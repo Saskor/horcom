@@ -1,6 +1,6 @@
 import React from "react";
 import { Select } from "../Select";
-import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/types";
+import { MenuItemComponentType, StandardOption } from "../../hooks/types";
 
 export const FieldSelect = <Option extends StandardOption, >(
   {

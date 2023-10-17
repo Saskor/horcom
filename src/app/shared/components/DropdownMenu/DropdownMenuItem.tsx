@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import cn from "classnames";
-import { MenuItemComponentType, StandardOption } from "../../componentsStateServices/types";
+import { MenuItemComponentType, StandardOption } from "../../hooks/types";
 
 type MenuItemProps<Option extends StandardOption> = {
   menuItemData: Option;

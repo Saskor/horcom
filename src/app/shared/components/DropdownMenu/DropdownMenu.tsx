@@ -1,6 +1,6 @@
 import cn from "classnames";
 import React, { CSSProperties, FC } from "react";
-import { StandardOption } from "../../componentsStateServices/types";
+import { StandardOption } from "../../hooks/types";
 import styles from "./DropdownMenu.scss";
 import { DropdownMenuItem } from "./DropdownMenuItem";
 

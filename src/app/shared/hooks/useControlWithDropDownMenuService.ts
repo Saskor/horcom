@@ -1,18 +1,15 @@
-import { CSSProperties, RefObject } from "react";
-import { StandardOption } from "../types";
+import React, { CSSProperties, RefObject } from "react";
+import { StandardOption } from "./types";
 
 type ControlWithDropDownMenuState = {
   activeMenuItemIndex: null | number;
   menuStyles: CSSProperties;
   menuItemsHover: boolean;
   userInput?: string;
-  anyControlOptionWasSelected?: boolean;
 };
 
 
-export type ControlWithDropDownMenuType<Option> = {
-  handleMount: () => void;
-  handleUnmount: () => void;
+export type ControlWithDropDownMenuMethodsType<Option> = {
   onMenuItemClick: (suggestion: Option, onChangeCallback: (value: Option) => void) => void;
   onMenuItemMouseMove: (menuItemIndex: number) => void;
   onMenuItemMouseEnter: (menuItemIndex: number) => void;
@@ -35,137 +32,125 @@ export type ControlWithDropDownMenuParamsType<
     Option,
     ComponentState extends ControlWithDropDownMenuState
 > = {
-  componentStateManageHelpers: {
-    getComponentState: () => ControlWithDropDownMenuState,
-    setComponentState: (newStatePart: Partial<ControlWithDropDownMenuState>) => void,
-  };
+  stateData: {
+    initialState: ComponentState;
+    state: ComponentState;
+  },
+  setComponentState: (newStatePart: Partial<ControlWithDropDownMenuState>) => void,
   serviceCallbacks: {
     getFilteredSuggestions?: (inputValue: string) => Array<Option>;
     onChange: (newValue: Option) => void;
     getLabel: (newValue: Option) => string;
   };
   refs: {containerRef: RefObject<HTMLDivElement>};
-  initialState: ComponentState;
 };
 
-export class ControlWithDropDownMenu<
+export type ControlWithDropDownMenuServiceType<
   Option extends StandardOption,
-  ComponentState extends ControlWithDropDownMenuState
-  >
-implements ControlWithDropDownMenuType<Option>{
-  private readonly setState;
+  ComponentState extends ControlWithDropDownMenuState,
+> = (params: ControlWithDropDownMenuParamsType<Option, ComponentState>) => ControlWithDropDownMenuMethodsType<Option>
 
-  private readonly getState;
-
-  private readonly serviceCallbacks;
-
-  private readonly refs;
-  
-  public readonly closeMenu;
-
-  constructor(
+export const useControlWithDropDownMenu = <
+  Option extends StandardOption,
+  ComponentState extends ControlWithDropDownMenuState,
+>(
     {
-      componentStateManageHelpers,
+      stateData: {
+        initialState,
+        state
+      },
+      setComponentState,
       serviceCallbacks,
-      refs,
-      initialState
+      refs
     }: ControlWithDropDownMenuParamsType<Option, ComponentState>
-  ) {
-    this.setState = componentStateManageHelpers.setComponentState;
-    this.getState = componentStateManageHelpers.getComponentState;
-    this.serviceCallbacks = serviceCallbacks;
-    this.refs = refs;
-    
-    this.closeMenu = () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { userInput, anyControlOptionWasSelected, ...rest } = initialState;
-      this.setState({ ...rest });
-    };
+  ): ControlWithDropDownMenuMethodsType<Option> => {
+  const closeMenu = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { userInput, ...rest } = initialState;
+    setComponentState({ ...rest });
+  };
 
-    this.handleMount = this.handleMount.bind(this);
-    this.handleUnmount = this.handleUnmount.bind(this);
-    this.onMenuItemClick = this.onMenuItemClick.bind(this);
-    this.onMenuItemMouseMove = this.onMenuItemMouseMove.bind(this);
-    this.onMenuItemMouseEnter = this.onMenuItemMouseEnter.bind(this);
-    this.setMenuStyles = this.setMenuStyles.bind(this);
-    this.handleClickOutside = this.handleClickOutside.bind(this);
-  }
-
-
-  public handleMount() {
-    document.addEventListener("scroll", this.closeMenu);
-    window.addEventListener("resize", this.closeMenu);
-    document.addEventListener("click", this.handleClickOutside, { capture: true });
-  }
-
-  public handleUnmount() {
-    document.removeEventListener("scroll", this.closeMenu);
-    window.removeEventListener("resize", this.closeMenu);
-    document.removeEventListener("click", this.handleClickOutside);
-  }
-
-  handleClickOutside(event: Event) {
-    const { containerRef } = this.refs || {};
+  const handleClickOutside = (event: Event) => {
+    const { containerRef } = refs || {};
     const clickInsideInput = containerRef.current
       && containerRef.current.contains(event.target as HTMLElement);
     const clickInsidePortal = (event.target as HTMLElement).closest("#portal-root");
 
     if (!clickInsideInput && !clickInsidePortal) {
-      this.closeMenu();
+      closeMenu();
     }
   };
 
-  onMenuItemMouseMove(menuItemIndex: number) {
-    const { activeMenuItemIndex, menuItemsHover } = this.getState();
+  const handleMount = () => {
+    document.addEventListener("scroll", closeMenu);
+    window.addEventListener("resize", closeMenu);
+    document.addEventListener("click", handleClickOutside, { capture: true });
+  };
+
+  const handleUnmount = () => {
+    document.removeEventListener("scroll", closeMenu);
+    window.removeEventListener("resize", closeMenu);
+    document.removeEventListener("click", handleClickOutside);
+  };
+
+  React.useEffect(() => {
+    handleMount();
+
+    return () => {
+      handleUnmount();
+    };
+  });
+
+  const onMenuItemMouseMove = (menuItemIndex: number) => {
+    const { activeMenuItemIndex, menuItemsHover } = state;
 
 
     if (!menuItemsHover) {
-      this.setState({
+      setComponentState({
         menuItemsHover: true
       });
     }
 
     if (menuItemIndex !== activeMenuItemIndex) {
-      this.setState({
+      setComponentState({
         activeMenuItemIndex: menuItemIndex
       });
     }
-  }
+  };
 
-  onMenuItemMouseEnter(menuItemIndex: number) {
-    const state = this.getState();
+  const onMenuItemMouseEnter = (menuItemIndex: number) => {
     if (!state.menuItemsHover) {
-      this.setState({
+      setComponentState({
         menuItemsHover: true
       });
     }
 
     if (menuItemIndex !== state.activeMenuItemIndex) {
-      this.setState({
+      setComponentState({
         activeMenuItemIndex: menuItemIndex
       });
     }
-  }
+  };
 
-  public onMenuItemClick(menuItem: Option, onChangeCallback: (value: Option) => void) {
+  const getUserInput = (dropDownMenuItemData: Option): string => {
+    const { getLabel } = serviceCallbacks;
+
+    return getLabel(dropDownMenuItemData);
+  };
+
+  const onMenuItemClick = (menuItem: Option, onChangeCallback: (value: Option) => void) => {
     const { disabled = false } = menuItem;
 
     if (disabled) {
       return;
     }
 
-    this.closeMenu();
-    this.setState({ userInput: this.getUserInput(menuItem), anyControlOptionWasSelected: true });
+    closeMenu();
+    setComponentState({ userInput: getUserInput(menuItem) });
     onChangeCallback(menuItem);
   };
 
-  private getUserInput(dropDownMenuItemData: Option): string {
-    const { getLabel } = this.serviceCallbacks;
-
-    return getLabel(dropDownMenuItemData);
-  }
-
-  public onControlKeyDown(
+  const onControlKeyDown = (
     {
       eventKey,
       dropdownMenuItemsData,
@@ -177,7 +162,7 @@ implements ControlWithDropDownMenuType<Option>{
       activeMenuItemIndex: number | null;
       onChangeCallback: (newValue: Option) => void;
     }
-  ) {
+  ) => {
     // User pressed the enter key
     if (eventKey === "Enter") {
       if (activeMenuItemIndex === null || dropdownMenuItemsData[activeMenuItemIndex].disabled) {
@@ -185,20 +170,19 @@ implements ControlWithDropDownMenuType<Option>{
       }
 
       onChangeCallback(dropdownMenuItemsData[activeMenuItemIndex]);
-      this.setState({ userInput: this.getUserInput(dropdownMenuItemsData[activeMenuItemIndex]) });
-      this.closeMenu();
-      this.setState({ anyControlOptionWasSelected: true });
+      setComponentState({ userInput: getUserInput(dropdownMenuItemsData[activeMenuItemIndex]) });
+      closeMenu();
     }
 
     // User pressed the esc key
     if (eventKey === "Escape") {
-      this.closeMenu();
+      closeMenu();
     }
 
     // User pressed the up arrow
     if (eventKey === "ArrowUp") {
       if (activeMenuItemIndex === 0) {
-        this.setState({
+        setComponentState({
           activeMenuItemIndex: dropdownMenuItemsData.length - 1,
           menuItemsHover: false
         });
@@ -206,7 +190,7 @@ implements ControlWithDropDownMenuType<Option>{
         return;
       }
 
-      this.setState({
+      setComponentState({
         activeMenuItemIndex: activeMenuItemIndex === null
           ? dropdownMenuItemsData.length - 1
           : activeMenuItemIndex - 1,
@@ -217,7 +201,7 @@ implements ControlWithDropDownMenuType<Option>{
     // User pressed the down arrow
     if (eventKey === "ArrowDown") {
       if (activeMenuItemIndex === dropdownMenuItemsData.length - 1) {
-        this.setState({
+        setComponentState({
           activeMenuItemIndex: 0,
           menuItemsHover: false
         });
@@ -225,7 +209,7 @@ implements ControlWithDropDownMenuType<Option>{
         return;
       }
 
-      this.setState({
+      setComponentState({
         activeMenuItemIndex: activeMenuItemIndex === null
           ? 0
           : activeMenuItemIndex + 1,
@@ -234,7 +218,7 @@ implements ControlWithDropDownMenuType<Option>{
     }
   };
 
-  public setMenuStyles(containerRef: RefObject<HTMLDivElement>): CSSProperties {
+  const setMenuStyles = (containerRef: RefObject<HTMLDivElement>): CSSProperties => {
     if (!containerRef.current) {
       return ({
         position: "absolute",
@@ -253,5 +237,14 @@ implements ControlWithDropDownMenuType<Option>{
       left: `${containerCoords.left}px`,
       width: `${containerCoords.right - containerCoords.left}px`
     });
-  }
-}
+  };
+
+  return {
+    onMenuItemClick,
+    onMenuItemMouseMove,
+    onMenuItemMouseEnter,
+    onControlKeyDown,
+    setMenuStyles,
+    closeMenu
+  };
+};
