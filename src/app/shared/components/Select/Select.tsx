@@ -7,7 +7,7 @@ import {
   MenuItemComponentType,
   StandardOption
 } from "../../hooks/types";
-import styles from "./Select.scss";
+import styles from "./Select.module.scss";
 import { useSelectService } from "app/shared/hooks/useSelectService";
 
 export type SelectStateType = {

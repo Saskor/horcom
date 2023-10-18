@@ -1,6 +1,6 @@
 import React from "react";
 import cn from "classnames";
-import styles from "./Button.scss";
+import styles from "./Button.module.scss";
 
 type ButtonProps = {
   type: "button" | "submit" | "reset";

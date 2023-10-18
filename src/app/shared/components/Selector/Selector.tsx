@@ -2,7 +2,7 @@ import React, { ReactElement } from "react";
 import cn from "classnames";
 import Select, { ActionMeta, OnChangeValue } from "react-select";
 
-import styles from "./Selector.scss";
+import styles from "./Selector.module.scss";
 
 type SelectProps <Option> = {
   label: string;

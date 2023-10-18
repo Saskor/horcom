@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import cn from "classnames";
 import { SearchPageStoreType } from "../../stores/searchPageStore";
 import { SearchPageListItem } from "../SearchPageListItem";
-import styles from "./SearchPageList.scss";
+import styles from "./SearchPageList.module.scss";
 
 export const SearchPageList = observer(
   (

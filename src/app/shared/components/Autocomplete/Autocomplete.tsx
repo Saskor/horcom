@@ -6,7 +6,7 @@ import {
   MenuItemComponentType,
   StandardOption
 } from "../../hooks/types";
-import styles from "./Autocomplete.scss";
+import styles from "./Autocomplete.module.scss";
 import { useAutocompleteService } from "app/shared/hooks/useAutocompleteService";
 
 export type AutocompleteStateType<Option> = {

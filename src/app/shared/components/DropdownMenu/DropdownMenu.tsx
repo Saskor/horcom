@@ -1,7 +1,7 @@
 import cn from "classnames";
 import React, { CSSProperties, FC } from "react";
 import { StandardOption } from "../../hooks/types";
-import styles from "./DropdownMenu.scss";
+import styles from "./DropdownMenu.module.scss";
 import { DropdownMenuItem } from "./DropdownMenuItem";
 
 type Props<Option extends StandardOption> = {

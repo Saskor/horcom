@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 import { SearchPageStoreType, FilterFormField } from "../../stores/searchPageStore";
 import { FieldAutocomplete } from "../../../../shared/components/FieldAutocomplete";
 import { SearchablePlace } from "../../constants/searchPage";
-import styles from "./SearchPageFilters.scss";
+import styles from "./SearchPageFilters.module.scss";
 
 export const SearchPageFilters = observer((
   {

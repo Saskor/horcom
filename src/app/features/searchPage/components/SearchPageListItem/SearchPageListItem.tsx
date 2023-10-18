@@ -1,7 +1,7 @@
 import React from "react";
 import cn from "classnames";
 import { ServicesProviderOrManufacturer, VK_SEARCH_REVIEWS_PAGE } from "../../constants/searchPage";
-import styles from "./SearchPageListItem.scss";
+import styles from "./SearchPageListItem.module.scss";
 import { useCopyText } from "app/shared/services/text";
 
 export const SearchPageListItem = ({
