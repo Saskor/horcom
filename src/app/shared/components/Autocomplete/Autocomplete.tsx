@@ -20,6 +20,7 @@ export type AutocompleteStateType<Option> = {
 
 export const Autocomplete = <Option extends StandardOption, >(
   {
+    label,
     getFilteredSuggestions,
     MenuItemComponent,
     dropdownMenuPortalTargetId,
@@ -28,6 +29,7 @@ export const Autocomplete = <Option extends StandardOption, >(
     placeholder = "",
     initialValue
   }: {
+    label: string;
     getFilteredSuggestions: (inputValue: string) => Array<Option>;
     MenuItemComponent?: MenuItemComponentType<Option>;
     dropdownMenuPortalTargetId?: string;
@@ -87,6 +89,7 @@ export const Autocomplete = <Option extends StandardOption, >(
         className={cn(styles.container)}
         ref={containerRef}
       >
+        <label className={cn(styles.label)}>{label}</label>
         <input
           className={cn(styles.input)}
           type="text"

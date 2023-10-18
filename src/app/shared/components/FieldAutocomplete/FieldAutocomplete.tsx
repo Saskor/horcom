@@ -5,6 +5,7 @@ import { FilterFormValues } from "app/features/searchPage/stores/searchPageStore
 
 export const FieldAutocomplete = <Option extends StandardOption, >(
   {
+    label,
     getFilteredSuggestions,
     MenuItemComponent,
     fieldName,
@@ -13,6 +14,7 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
     placeholder = "",
     formValues
   }: {
+    label: string;
     getFilteredSuggestions: (inputValue: string) => Array<Option>;
     MenuItemComponent?: MenuItemComponentType<Option>;
     fieldName: keyof FilterFormValues;
@@ -30,6 +32,7 @@ export const FieldAutocomplete = <Option extends StandardOption, >(
 
   return (
     <Autocomplete<Option>
+      label={label}
       getFilteredSuggestions={getFilteredSuggestions}
       MenuItemComponent={MenuItemComponent}
       onChange={onChange}

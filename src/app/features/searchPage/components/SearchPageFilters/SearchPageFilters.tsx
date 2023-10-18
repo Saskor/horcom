@@ -27,6 +27,7 @@ export const SearchPageFilters = observer((
   return (
     <div className={cn(styles.container)}>
       <FieldAutocomplete<FilterFormField>
+        label="Что искать"
         getFilteredSuggestions={createSubcategoryOptions}
         fieldName="subcategory"
         onFieldChange={onChangeFilterFormValue}
@@ -34,6 +35,7 @@ export const SearchPageFilters = observer((
         formValues={filterFormValues}
       />
       <FieldAutocomplete<SearchablePlace>
+        label="Где искать"
         getFilteredSuggestions={getSearchablePlaceOptions}
         fieldName="searchablePlace"
         onFieldChange={onChangeFilterFormValue}
