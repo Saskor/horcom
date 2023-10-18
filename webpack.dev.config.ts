@@ -44,7 +44,7 @@ const config: Configuration = {
         ]
       },
       {
-        test: /\.s[ac]ss$/i,
+        test: /\.scss$/i,
         exclude: /node_modules/,
         use: [
           // Creates `style` nodes from JS strings
@@ -53,15 +53,35 @@ const config: Configuration = {
           {
             loader: "css-loader",
             options: {
+              sourceMap: true
+            }
+          },
+          {
+            // Compiles Sass to CSS
+            loader: "sass-loader",
+            options: {
+              sourceMap: true
+            }
+          }
+        ]
+      },
+      {
+        test: /\.module\.scss$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          "style-loader",
+          // Translates CSS into CommonJS
+          {
+            loader: "css-loader",
+            options: {
               sourceMap: true,
-              importLoaders: 1,
               modules: {
                 localIdentName: "[name]__[local]--[hash:base64:5]"
               }
             }
           },
+          // Compiles Sass to CSS
           {
-            // Compiles Sass to CSS
             loader: "sass-loader",
             options: {
               sourceMap: true

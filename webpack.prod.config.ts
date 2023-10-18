@@ -61,10 +61,7 @@ const config: Configuration = {
           },
           {
             // Compiles Sass to CSS
-            loader: "sass-loader",
-            options: {
-              sourceMap: true
-            }
+            loader: "sass-loader"
           }
         ]
       },
