@@ -26,7 +26,7 @@ type AutocompleteServiceParamsType<Option> = {
   refs: {containerRef: RefObject<HTMLDivElement>};
 };
 
-type AutocompleteServiceType<Option> = {
+type AutocompleteServiceMethodsType<Option> = {
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAutocompleteControlKeyDown: (e: React.KeyboardEvent) => void;
   onMenuItemClick: (menuItem: Option) => void;
@@ -44,7 +44,7 @@ export const useAutocompleteService = <Option extends StandardOption, >(
     serviceCallbacks,
     refs
   }: AutocompleteServiceParamsType<Option>
-): AutocompleteServiceType<Option> => {
+): AutocompleteServiceMethodsType<Option> => {
 
   const controlWithDropDownMenu = useControlWithDropDownMenu<Option, AutocompleteServiceStateType<Option>>(
     {

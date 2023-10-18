@@ -23,7 +23,7 @@ type SelectServiceParamsType<Option> = {
   refs: {containerRef: RefObject<HTMLDivElement>};
 };
 
-type SelectServiceType<Option> = {
+type SelectServiceMethodsType<Option> = {
   onSelectClick: () => void;
   onSelectControlKeyDown: (e: React.KeyboardEvent) => void;
   onMenuItemClick: (menuItem: Option) => void;
@@ -42,7 +42,7 @@ export const useSelectService = <Option extends StandardOption>(
     serviceCallbacks,
     refs
   }: SelectServiceParamsType<Option>
-): SelectServiceType<Option> => {
+): SelectServiceMethodsType<Option> => {
 
 
   const controlWithDropDownMenu = useControlWithDropDownMenu<Option, SelectServiceStateType>(
