@@ -1,10 +1,9 @@
 .container {
   display: flex;
-  width: 80%;
-  min-width: 80%;
-  height: 300px;
+  flex-wrap: wrap;
+  justify-content: center;
   padding: 10px;
-  margin: 10px 0 10px;
+  margin: 10px 0;
 }
 
 .container:hover {
@@ -12,12 +11,11 @@
 }
 
 .imgContainer {
-  display: flex;
+  width: 240px;
+  height: 240px;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  min-width: 240px;
-  max-width: 240px;
   background: #ebebeb;
 
   img {
@@ -30,7 +28,7 @@
 }
 
 .infoContainer {
-  display: flex;
+  flex: 0 0 300px;
   padding: 10px;
   flex-direction: column;
   align-items: start;
