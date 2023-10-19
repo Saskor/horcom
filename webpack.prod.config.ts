@@ -101,8 +101,7 @@ const config: Configuration = {
       // include all types of chunks
       chunks: "all"
     }
-  },
-  devtool: "source-map"
+  }
 };
 
 export default config;
