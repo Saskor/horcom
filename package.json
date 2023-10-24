@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "start": "webpack serve --config webpack.dev.config.ts",
+    "buildForGithubPages": "webpack --config webpack.prod.config.ts && node copyScript.js",
     "build": "webpack --config webpack.prod.config.ts",
     "test": "cross-env jest",
     "test:watch": "jest --watch",
@@ -63,7 +64,7 @@
     "@types/fork-ts-checker-webpack-plugin": "^0.4.5",
     "@types/jest": "^27.5.0",
     "@types/lodash": "^4.14.182",
-    "@types/node": "^18.11.9",
+    "@types/node": "^18.18.6",
     "@types/react": "^17.0.40",
     "@types/react-autocomplete": "^1.8.6",
     "@types/react-dom": "^17.0.13",

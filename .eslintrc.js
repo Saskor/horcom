@@ -44,7 +44,7 @@ module.exports = {
     node: true,
     es6: true
   },
-  ignorePatterns: [ "src/**/*d.ts" ],
+  ignorePatterns: [ "src/**/*d.ts", "copyScript.js" ],
   rules: {
     // Import rules
     "import/no-unresolved": "error",
